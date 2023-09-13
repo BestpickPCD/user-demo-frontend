@@ -13,6 +13,7 @@ import { IntlProvider } from "react-intl";
 import { Provider } from "react-redux";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useRouter } from "next/router";
 const clientSideEmotionCache = createEmotionCache();
 export interface MyAppProps extends AppProps {
   emotionCache?: EmotionCache;
@@ -23,6 +24,7 @@ const messages = {
 };
 
 function MyApp(props: MyAppProps) {
+  const router = useRouter()
   const { Component, emotionCache = clientSideEmotionCache, pageProps } = props;
   const [language, setLanguage] = useState<string>("");
   const [isDarkMode, setIsDarkMode] = useState<string>("dark");
@@ -45,6 +47,11 @@ function MyApp(props: MyAppProps) {
     return setIsDarkMode("dark");
   }, []);
 
+  useEffect(() => {
+    if(router.pathname === "/_error") {
+      router.push("/login")
+    } 
+  }, [])
   return (
     <Provider store={store}>
       <IntlProvider locale="en" messages={(messages as any)[language || "en"]}>
