@@ -4,6 +4,8 @@ const nextConfig = {
     domains: ["ap-south-1.linodeobjects.com","https://user-demo-frontend.vercel.app/"],
 
   },
+  reactStrictMode: false,
+  styledComponents: true,
 };
 
 module.exports = nextConfig;

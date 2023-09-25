@@ -14,6 +14,9 @@ import { Provider } from "react-redux";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useRouter } from "next/router";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
+
 const clientSideEmotionCache = createEmotionCache();
 export interface MyAppProps extends AppProps {
   emotionCache?: EmotionCache;
@@ -24,10 +27,10 @@ const messages = {
 };
 
 function MyApp(props: MyAppProps) {
-  const router = useRouter()
+  const router = useRouter();
   const { Component, emotionCache = clientSideEmotionCache, pageProps } = props;
   const [language, setLanguage] = useState<string>("");
-  const [isDarkMode, setIsDarkMode] = useState<string>("dark");
+  const [isDarkMode, setIsDarkMode] = useState<string>();
 
   useEffect(() => {
     const language = localStorage.getItem("language");
@@ -37,6 +40,8 @@ function MyApp(props: MyAppProps) {
     localStorage.setItem("language", "en");
     return setLanguage("en");
   }, []);
+
+  console.log(isDarkMode);
 
   useEffect(() => {
     const theme = localStorage.getItem("theme");
@@ -48,10 +53,10 @@ function MyApp(props: MyAppProps) {
   }, []);
 
   useEffect(() => {
-    if(router.pathname === "/_error") {
-      router.push("/login")
-    } 
-  }, [])
+    if (router.pathname === "/_error") {
+      router.push("/login");
+    }
+  }, []);
   return (
     <Provider store={store}>
       <IntlProvider locale="en" messages={(messages as any)[language || "en"]}>
@@ -62,19 +67,23 @@ function MyApp(props: MyAppProps) {
               content="initial-scale=1, width=device-width"
             />
           </Head>
-          <ThemeProvider
-            theme={isDarkMode === "light" ? lightModeTheme : darkModeTheme}
-          >
-            <CssBaseline />
-            <Component
-              {...pageProps}
-              language={language}
-              isDarkMode={isDarkMode}
-              onSetLanguage={setLanguage}
-              onSetDarkMode={setIsDarkMode}
-            />
-            <ToastContainer />
-          </ThemeProvider>
+          {(isDarkMode === "light" || isDarkMode === "dark") && (
+            <ThemeProvider
+              theme={isDarkMode === "light" ? lightModeTheme : darkModeTheme}
+            >
+              <LocalizationProvider dateAdapter={AdapterMoment}>
+                <CssBaseline />
+                <Component
+                  {...pageProps}
+                  language={language}
+                  isDarkMode={isDarkMode}
+                  onSetLanguage={setLanguage}
+                  onSetDarkMode={setIsDarkMode}
+                />
+              </LocalizationProvider>
+              <ToastContainer />
+            </ThemeProvider>
+          )}
         </CacheProvider>
       </IntlProvider>
     </Provider>
