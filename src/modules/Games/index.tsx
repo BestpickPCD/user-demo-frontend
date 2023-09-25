@@ -71,10 +71,7 @@ const Games = () => {
                 <Item
                   onClick={() => onClickGame(item)}
                   sx={
-                    theme.palette.mode === "dark" && {
-                      boxShadow:
-                        "0px 1px 2px 0px rgba(255, 255, 255, 0.3), 1px 2px 4px 0px rgba(255, 255, 255, 0.3), 2px 4px 8px 0px rgba(255, 255, 255, 0.3), 2px 4px 16px 0px rgba(255, 255, 255, 0.3)",
-                    }
+                    {boxShadow:"0px 1px 2px 0px rgba(255, 255, 255, 0.3), 1px 2px 4px 0px rgba(255, 255, 255, 0.3), 2px 4px 8px 0px rgba(255, 255, 255, 0.3), 2px 4px 16px 0px rgba(255, 255, 255, 0.3)",}
                   }
                 >
                   <Box
