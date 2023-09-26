@@ -16,7 +16,21 @@ export const GamesService = createApi({
         url: "/games",
       }),
     }),
+    getTransaction: builder.query<
+      ResponseType<{
+        data: any[];
+        page: number;
+        size: number;
+        totalItems: number;
+      }>,
+      any
+    >({
+      query: (params) => ({
+        url: "/transactions",
+        params,
+      }),
+    }),
   }),
 });
 
-export const { useGetGamesQuery } = GamesService;
+export const { useGetGamesQuery, useGetTransactionQuery } = GamesService;

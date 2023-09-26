@@ -20,9 +20,11 @@ const PageHeader = ({
 }: PageHeaderProps): JSX.Element => (
   <Grid container justifyContent="space-between" alignItems="center">
     <Grid item>
-      <Typography variant="h3" component="h3" gutterBottom>
-        <FormattedMessage id={headerTitle} />
-      </Typography>
+      {headerTitle && (
+        <Typography variant="h3" component="h3" gutterBottom>
+          <FormattedMessage id={headerTitle} />
+        </Typography>
+      )}
       <Typography variant="subtitle2">{headerSubtitle}</Typography>
       {breadcrumbs && (
         <Box marginTop="8px">

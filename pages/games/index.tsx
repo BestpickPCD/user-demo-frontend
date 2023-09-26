@@ -1,13 +1,14 @@
 import MainLayout from "@/layouts/MainLayout";
-import Games from "@/modules/Games";
-import React from "react";
+import dynamic from "next/dynamic";
 
-const GamesPage = (props: any) => {
+const Games = dynamic(() => import("@/modules/Games"), {
+  loading: () => <p>Loading...</p>,
+});
+
+export default function GamesPage(props: any) {
   return (
     <MainLayout {...props}>
       <Games />
     </MainLayout>
   );
-};
-
-export default GamesPage;
+}

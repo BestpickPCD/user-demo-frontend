@@ -1,4 +1,4 @@
-import { Container, Grid } from "@mui/material";
+import { Box, Container, Grid } from "@mui/material";
 import { ReactNode, memo } from "react";
 import { useIntl } from "react-intl";
 import Footer from "@/components/Footer";
@@ -9,7 +9,7 @@ import Table from "./Table";
 import { PaginationAndSort, TableBody, TableHeader } from "./tableType";
 
 interface TableProps<D, P> {
-  title: string;
+  title?: string;
   data: D[];
   tableHeader?: TableHeader[];
   headerTitle?: string;
@@ -50,10 +50,8 @@ const TableComponent = ({
   onUpdate,
   onPagination,
 }: TableProps<any, PaginationAndSort>): JSX.Element => {
-  const intl = useIntl();
   return (
-    <>
-      <title>{intl.formatMessage({ id: title })}</title>
+    <Box sx={{ marginTop: 10 }}>
       <PageTitleWrapper>
         <PageHeader
           headerTitle={headerTitle}
@@ -88,7 +86,7 @@ const TableComponent = ({
         </Grid>
       </Container>
       <Footer />
-    </>
+    </Box>
   );
 };
 

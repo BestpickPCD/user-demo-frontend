@@ -67,7 +67,7 @@ const Headers = ({
               <Link href="/games">Games</Link>
             </ListItem>
             <ListItem className="w-full whitespace-nowrap">
-              <Link href="/betting-history">Betting History</Link>
+              <Link href="/transactions">Betting History</Link>
             </ListItem>
           </List>
         </Box>

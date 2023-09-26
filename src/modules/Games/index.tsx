@@ -70,9 +70,12 @@ const Games = () => {
               <Grid item xs={4} sm={4} md={3} key={index}>
                 <Item
                   onClick={() => onClickGame(item)}
-                  sx={
-                    {boxShadow:"0px 1px 2px 0px rgba(255, 255, 255, 0.3), 1px 2px 4px 0px rgba(255, 255, 255, 0.3), 2px 4px 8px 0px rgba(255, 255, 255, 0.3), 2px 4px 16px 0px rgba(255, 255, 255, 0.3)",}
-                  }
+                  sx={{
+                    boxShadow:
+                      theme.palette.mode === "dark"
+                        ? "0px 1px 2px 0px rgba(255, 255, 255, 0.3), 1px 2px 4px 0px rgba(255, 255, 255, 0.3), 2px 4px 8px 0px rgba(255, 255, 255, 0.3), 2px 4px 16px 0px rgba(255, 255, 255, 0.3)"
+                        : "0px 2px 1px -1px rgba(0,0,0,0.2), 0px 1px 1px 0px rgba(0,0,0,0.14), 0px 1px 3px 0px rgba(0,0,0,0.12)",
+                  }}
                 >
                   <Box
                     bgcolor={theme.palette.mode === "dark" ? "#fff" : "#b1b1b1"}
