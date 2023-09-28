@@ -41,8 +41,6 @@ function MyApp(props: MyAppProps) {
     return setLanguage("en");
   }, []);
 
-  console.log(isDarkMode);
-
   useEffect(() => {
     const theme = localStorage.getItem("theme");
     if (theme && (theme === "dark" || theme === "light")) {

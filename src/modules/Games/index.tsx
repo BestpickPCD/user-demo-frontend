@@ -52,7 +52,6 @@ const Games = () => {
     setGameData(item);
     toggle();
   };
-  console.log(gameData);
 
   return (
     <>
