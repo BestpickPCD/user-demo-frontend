@@ -89,7 +89,8 @@ const Chat = () => {
   };
 
   useEffect(() => {
-    socketClient.current = io("https://chat-service-backend.onrender.com", {
+    socketClient.current = io("http://localhost:8080", {
+    // socketClient.current = io("https://chat-service-backend.onrender.com", {
       withCredentials: true,
     });
     if (currentUser) {
