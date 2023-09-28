@@ -54,14 +54,17 @@ export default function Home() {
       if (response.message === "SUCCESS") {
         reset();
         router.push("/games");
-        const { tokens, userId, username } = response.data;
+        const { tokens, id, email, name, username, type } = response.data;
         localStorage.setItem(
           "tokens",
           JSON.stringify({
             token: tokens,
           })
         );
-        localStorage.setItem("user", JSON.stringify({ userId, username }));
+        localStorage.setItem(
+          "user",
+          JSON.stringify({ id, email, name, username, type })
+        );
       }
     } catch (error: any) {
       if ((error.data.message as any) === "NOT_FOUND") {

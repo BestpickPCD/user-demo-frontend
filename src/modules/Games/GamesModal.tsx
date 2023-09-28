@@ -9,8 +9,6 @@ interface GamesModalProps {
   toggle: () => void;
 }
 const GamesModal = ({ data, visible, title, toggle }: GamesModalProps) => {
-  console.log(data);
-
   return (
     <Modals open={visible} onClose={toggle} maxWidth="lg" modalTitle={title}>
       <Box padding={2}>
