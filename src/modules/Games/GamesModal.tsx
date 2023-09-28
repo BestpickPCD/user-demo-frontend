@@ -21,12 +21,9 @@ const GamesModal = ({ data, visible, title, toggle }: GamesModalProps) => {
             <Grid key={item.id} item xs={4} sm={4} md={3}>
               <Card>
                 <Box padding={1}>
-                  <Image
+                  <img
                     src={item.thumbnail}
                     alt={item.title}
-                    width={100}
-                    height={100}
-                    layout="responsive"
                   />
                 </Box>
                 <Typography padding={1}>{item.title}</Typography>

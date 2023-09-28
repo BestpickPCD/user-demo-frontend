@@ -60,7 +60,7 @@ export const baseQueryWithReAuth: BaseQueryFn<
 };
 
 export const baseQueryChat = fetchBaseQuery({
-  baseUrl: `http://localhost:8080`,
+  baseUrl: process.env.NEXT_PUBLIC_API_CHAT_URL,
   prepareHeaders: (headers) => {
     const token = localStorage.getItem("tokens");
     if (token) {
@@ -110,5 +110,5 @@ export const baseQueryWithReAuthChat: BaseQueryFn<
 };
 
 export const baseQueryWithoutTokenChat = fetchBaseQuery({
-  baseUrl: `http://localhost:8080`,
+  baseUrl: process.env.NEXT_PUBLIC_API_CHAT_URL,
 });
