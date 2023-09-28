@@ -3,6 +3,7 @@ import {
   useGetMessageQuery,
   useGetRoomsQuery,
   useSaveChatMutation,
+  useUpdateRoomMutation,
 } from "@/services/chatService";
 import { useCheckUserMutation } from "@/services/gamesService";
 import { useModal } from "@/utils/hooks";
@@ -21,6 +22,7 @@ import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
 import io from "socket.io-client";
 import UploadFile from "../UploadFile";
+
 const Chat = () => {
   const [chat, setChat] = useState<any>({
     text: "",
@@ -34,6 +36,7 @@ const Chat = () => {
   const [uploadFile, setUploadFile] = useState<File[]>([]);
   const [chatArr, setChatArr] = useState<any[]>([]);
 
+  const [updateRoom] = useUpdateRoomMutation();
   const [checkUser] = useCheckUserMutation();
   const { visible, toggle, hide } = useModal();
   const { data } = useGetMessageQuery(
@@ -45,7 +48,8 @@ const Chat = () => {
       skip: !(currentUser?.id && roomId?._id),
     }
   );
-  const { data: roomsData } = useGetRoomsQuery(
+
+  const { data: roomsData, refetch: refetchRoom } = useGetRoomsQuery(
     {
       username: currentUser?.username,
       id: currentUser?.id,
@@ -124,8 +128,6 @@ const Chat = () => {
         userData: currentUser.id,
       });
       socketClient.current.on("messages-back", (message: any) => {
-        console.log(message);
-
         setChatArr((prev) => [
           ...prev,
           {
@@ -134,8 +136,21 @@ const Chat = () => {
           },
         ]);
       });
+      socketClient.current.on("new-message", (message: any) => {
+        refetchRoom();
+      });
+      updateRoom({
+        roomId: roomId?._id,
+        ...(currentUser.type === "player"
+          ? { newGuestMessages: 0 }
+          : { newUserMessages: 0 }),
+      })
+        .unwrap()
+        .then((result) => {
+          refetchRoom();
+        });
     }
-  }, [roomId]);
+  }, [roomId, currentUser]);
 
   const handleChangeText = (e: any) => {
     setChat((prev: any) => ({
@@ -157,6 +172,7 @@ const Chat = () => {
         status: "pending",
         roomId: roomId?._id,
       };
+
       const { image, ...rest } = data;
       const formData = new FormData();
       image.forEach((item: any) => formData.append("image", item));
@@ -168,6 +184,28 @@ const Chat = () => {
             ...data.data,
           });
         });
+
+      const room = roomsData?.data?.find(
+        (item: any) => item._id === roomId._id
+      );
+
+      await updateRoom({
+        roomId: roomId?._id,
+        ...(currentUser.type === "player"
+          ? { newUserMessages: room?.newUserMessages + 1 }
+          : { newGuestMessages: room?.newGuestMessages + 1 }),
+      })
+        .unwrap()
+        .then((data) => {
+          return socketClient.current.emit("new-messages", {
+            [`${String(roomId._id)}`]: {
+              roomId: roomId._id,
+              newUserMessages: data?.data?.newUserMessages,
+              newGuestMessages: data?.data?.newGuestMessages,
+            },
+          });
+        });
+
       setChat((prev: any) => ({
         ...prev,
         text: "",
@@ -194,6 +232,18 @@ const Chat = () => {
     setRoomId(item);
   };
 
+  const onFocus = async () => {
+    await updateRoom({
+      roomId: roomId?._id,
+      ...(currentUser.type === "player"
+        ? { newGuestMessages: 0 }
+        : { newUserMessages: 0 }),
+    })
+      .unwrap()
+      .then((result) => {
+        refetchRoom();
+      });
+  };
   return (
     <Container
       sx={{
@@ -217,6 +267,11 @@ const Chat = () => {
               {currentUser?.type === "player"
                 ? item?.guess?.name
                 : item?.username}
+            </Typography>
+            <Typography>
+              {currentUser?.type === "player"
+                ? item?.newGuestMessages
+                : item?.newUserMessages}
             </Typography>
           </Box>
         ))}
@@ -343,6 +398,7 @@ const Chat = () => {
               onKeyDown={handleKeyDown}
               fullWidth
               sx={{ borderRadius: "20%" }}
+              onFocus={onFocus}
             />
             <Button
               onClick={handleChat}
