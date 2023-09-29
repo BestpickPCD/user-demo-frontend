@@ -22,20 +22,25 @@ import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
 import io from "socket.io-client";
 import UploadFile from "../UploadFile";
+import Link from "next/link";
+import { useClickOutside } from "@/utils/hooks";
 
+const CHAT_URL = process.env.NEXT_PUBLIC_API_CHAT_URL;
 const Chat = () => {
   const [chat, setChat] = useState<any>({
     text: "",
   });
   const socketClient = useRef<any>(null);
   const [currentUser, setCurrentUser] = useState<any>();
+  const [setSendOrSeen, setSentOrSeen] = useState<"Sent" | "Seen" | "">("");
   const [roomId, setRoomId] = useState<any>();
   const router = useRouter();
   const [createRoom] = useCreateRoomMutation();
   const [saveChat] = useSaveChatMutation();
   const [uploadFile, setUploadFile] = useState<File[]>([]);
   const [chatArr, setChatArr] = useState<any[]>([]);
-
+  const parentRef = useRef<HTMLDivElement | null>(null);
+  const emojiRef = useRef<HTMLDivElement | null>(null);
   const [updateRoom] = useUpdateRoomMutation();
   const [checkUser] = useCheckUserMutation();
   const { visible, toggle, hide } = useModal();
@@ -85,6 +90,13 @@ const Chat = () => {
           }
         });
     }
+    if (typeof window !== "undefined") {
+      window?.addEventListener("keydown", (e: any) => {
+        if (e.key === "Escape") {
+          hide();
+        }
+      });
+    }
   }, []);
 
   const onCreateRoom = async (body: any) => {
@@ -123,10 +135,6 @@ const Chat = () => {
 
   useEffect(() => {
     if (roomId?._id) {
-      socketClient.current.emit("add-user", {
-        roomId: roomId?._id,
-        userData: currentUser.id,
-      });
       socketClient.current.on("messages-back", (message: any) => {
         setChatArr((prev) => [
           ...prev,
@@ -135,9 +143,6 @@ const Chat = () => {
             self: message.userId === currentUser.id,
           },
         ]);
-      });
-      socketClient.current.on("new-message", (message: any) => {
-        refetchRoom();
       });
       updateRoom({
         roomId: roomId?._id,
@@ -150,7 +155,32 @@ const Chat = () => {
           refetchRoom();
         });
     }
+    socketClient?.current?.on("new-message", (message: any) => {
+      refetchRoom();
+    });
   }, [roomId, currentUser]);
+
+  useEffect(() => {
+    if (currentUser?.id) {
+      if (currentUser?.type === "player") {
+        console.log("vao day");
+
+        socketClient.current.emit("add-user", {
+          roomId: roomId?._id,
+          userData: currentUser.id,
+        });
+      } else {
+        if (roomsData && roomsData?.data?.length) {
+          roomsData?.data?.map((item: any) =>
+            socketClient.current.emit("add-user", {
+              roomId: item?._id,
+              userData: currentUser.id,
+            })
+          );
+        }
+      }
+    }
+  }, [currentUser, roomsData, roomId]);
 
   const handleChangeText = (e: any) => {
     setChat((prev: any) => ({
@@ -160,7 +190,7 @@ const Chat = () => {
   };
 
   const handleChat = async () => {
-    if (chat.text || uploadFile.length > 0) {
+    if (Boolean(chat.text.trim() || uploadFile.length > 0)) {
       const data: any = {
         text: chat.text,
         image: uploadFile,
@@ -197,7 +227,7 @@ const Chat = () => {
       })
         .unwrap()
         .then((data) => {
-          return socketClient.current.emit("new-messages", {
+          socketClient.current.emit("new-messages", {
             [`${String(roomId._id)}`]: {
               roomId: roomId._id,
               newUserMessages: data?.data?.newUserMessages,
@@ -216,7 +246,7 @@ const Chat = () => {
   };
 
   const handleKeyDown = async (e: any) => {
-    if (e.key === "Enter") {
+    if (e.key === "Enter" && !e.shiftKey) {
       await handleChat();
     }
   };
@@ -244,16 +274,22 @@ const Chat = () => {
         refetchRoom();
       });
   };
+
+  useClickOutside(emojiRef, hide);
+
   return (
     <Container
       sx={{
         marginTop: 10,
-        height: "calc(100vh - 80px)",
+        height: "calc(100vh - 90px)",
         display: "flex",
         padding: "10px 0",
+        position: "relative",
+        zIndex: "100",
       }}
+      ref={parentRef}
     >
-      <Box width="200px" maxWidth="100%" borderRight="1px solid gray">
+      <Box width="240px" maxWidth="100%" borderRight="1px solid gray">
         {roomsData?.data?.map((item: any, index: number) => (
           <Box
             key={index}
@@ -262,17 +298,38 @@ const Chat = () => {
             marginRight="20px"
             padding="8px 12px"
             borderRadius="8px"
+            display="flex"
+            justifyContent="space-between"
+            alignItems="center"
+            gap="4px"
           >
-            <Typography>
+            <Typography
+              flex={1}
+              overflow="hidden"
+              textOverflow="ellipsis"
+              whiteSpace="nowrap"
+            >
               {currentUser?.type === "player"
                 ? item?.guess?.name
                 : item?.username}
             </Typography>
-            <Typography>
-              {currentUser?.type === "player"
-                ? item?.newGuestMessages
-                : item?.newUserMessages}
-            </Typography>
+            {(currentUser?.type === "player"
+              ? !!item?.newGuestMessages
+              : !!item?.newUserMessages) && (
+              <Typography
+                textAlign="center"
+                lineHeight="32px"
+                height="32px"
+                width="32px"
+                borderRadius="100%"
+                color="#fff"
+                sx={{ background: "red" }}
+              >
+                {currentUser?.type === "player"
+                  ? item?.newGuestMessages
+                  : item?.newUserMessages}
+              </Typography>
+            )}
           </Box>
         ))}
       </Box>
@@ -280,17 +337,16 @@ const Chat = () => {
         display="flex"
         flexDirection="column"
         justifyContent="space-between"
-        height="100%"
         flex="1"
         gap={1}
+        height="calc(100vh - 170px)"
       >
-        <Box>
+        <Box flex="1" height="100%" flexShrink={0}>
           <div
             ref={scrollingDivRef}
             style={{
               maxHeight: "100%",
               overflow: "auto",
-              height: "calc(100vh - 80px - 90px)",
               display: "flex",
               flexDirection: "column",
               gap: "12px",
@@ -335,7 +391,7 @@ const Chat = () => {
                     justifyContent={`${chat?.self ? "flex-end" : "flex-start"}`}
                     gap={1}
                   >
-                    {chat?.image?.map((image1: any, index: any) => (
+                    {chat?.image?.map((image: any, index: any) => (
                       <Box
                         width={"33%"}
                         borderRadius={"8px"}
@@ -343,21 +399,28 @@ const Chat = () => {
                         height={120}
                         key={index}
                       >
-                        <Image
-                          alt="123"
-                          width={200}
-                          height={300}
-                          style={{
-                            objectFit: "cover",
-                            width: "100%",
-                            height: "100%",
-                            maxWidth: "100%",
-                          }}
-                          src={`http://localhost:8080/${image1}`}
-                        />
+                        <Link
+                          href={`${CHAT_URL}/${image}`}
+                          rel="noopener noreferrer"
+                          target="_blank"
+                        >
+                          <Image
+                            alt="123"
+                            width={200}
+                            height={300}
+                            style={{
+                              objectFit: "cover",
+                              width: "100%",
+                              height: "100%",
+                              maxWidth: "100%",
+                            }}
+                            src={`${CHAT_URL}/${image}`}
+                          />
+                        </Link>
                       </Box>
                     ))}
                   </Box>
+                  {index === chatArr.length - 1 && chat?.self && setSendOrSeen}
                 </Box>
               </Box>
             ))}
@@ -370,6 +433,7 @@ const Chat = () => {
           gap="8px"
           paddingX={2}
           position="relative"
+          zIndex={1}
         >
           {visible && (
             <div style={{ position: "absolute", bottom: "72px", left: "40px" }}>
@@ -377,11 +441,10 @@ const Chat = () => {
                 onEmojiSelect={handleSelectEmoji}
                 theme="light"
                 previewPosition="none"
-                navPosition="none"
               />
             </div>
           )}
-          <div onClick={toggle}>
+          <div onClick={toggle} ref={emojiRef}>
             <EmojiEmotions />
           </div>
           <UploadFile uploadFile={uploadFile} onSetUploadFile={setUploadFile} />
@@ -399,6 +462,7 @@ const Chat = () => {
               fullWidth
               sx={{ borderRadius: "20%" }}
               onFocus={onFocus}
+              multiline={false}
             />
             <Button
               onClick={handleChat}
@@ -428,3 +492,24 @@ const CustomTextField = styled(TextField)(
   }
 `
 );
+
+// .unwrap()
+// .then((data) => {
+//   if (roomId?._id && data && data?.data?.length > 0) {
+//     const room = data?.data?.find(
+//       (item: any) => item._id === roomId._id
+//     );
+//     if (currentUser.type === "player") {
+//       if (room.newUserMessages === 0) {
+//         return setSentOrSeen("Seen");
+//       }
+//       return setSentOrSeen("Sent");
+//     }
+//     if (currentUser.type !== "player") {
+//       if (room.newGuestMessages === 0) {
+//         setSentOrSeen("Seen");
+//       }
+//       setSentOrSeen("Sent");
+//     }
+//   }
+// });
