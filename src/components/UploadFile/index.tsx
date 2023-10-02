@@ -23,8 +23,12 @@ const UploadFile = ({
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      window.addEventListener("dragenter", () => {
+      window.addEventListener("dragover", (e) => {
+        e.preventDefault();
         setIsDrop(true);
+      });
+      window.addEventListener("dragleave", () => {
+        setIsDrop(false);
       });
 
       window.addEventListener("drop", () => {

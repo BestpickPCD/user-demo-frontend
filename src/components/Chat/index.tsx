@@ -105,7 +105,7 @@ const Chat = () => {
   };
 
   useEffect(() => {
-    socketClient.current = io("http://localhost:8080", {
+    socketClient.current = io(String(process.env.NEXT_PUBLIC_API_CHAT_URL), {
       withCredentials: true,
     });
     if (currentUser) {
