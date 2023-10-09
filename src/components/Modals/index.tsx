@@ -33,34 +33,36 @@ function Modals({
       {modalTitle && <Divider />}
       <List sx={{ pt: 0 }}>{children}</List>
       <Divider />
-      <Container
-        sx={{
-          display: "flex",
-          justifyContent: "flex-end",
-          gap: "16px",
-          padding: "12px 0",
-        }}
-      >
-        {isShowCancel && (
-          <Button variant="outlined" sx={{ width: "90px" }} onClick={onClose}>
-            <FormattedMessage id="label.cancel" />
-          </Button>
-        )}
+      {(isShowCancel || onOk) && (
+        <Container
+          sx={{
+            display: "flex",
+            justifyContent: "flex-end",
+            gap: "16px",
+            padding: "12px 0",
+          }}
+        >
+          {isShowCancel && (
+            <Button variant="outlined" sx={{ width: "90px" }} onClick={onClose}>
+              <FormattedMessage id="label.cancel" />
+            </Button>
+          )}
 
-        {onOk && (
-          <LoadingButton
-            onClick={onOk}
-            loading={isLoading}
-            loadingPosition="start"
-            startIcon={<SaveIcon />}
-            variant="contained"
-            sx={{ width: "90px" }}
-            type="submit"
-          >
-            <FormattedMessage id="label.OK" />
-          </LoadingButton>
-        )}
-      </Container>
+          {onOk && (
+            <LoadingButton
+              onClick={onOk}
+              loading={isLoading}
+              loadingPosition="start"
+              startIcon={<SaveIcon />}
+              variant="contained"
+              sx={{ width: "90px" }}
+              type="submit"
+            >
+              <FormattedMessage id="label.OK" />
+            </LoadingButton>
+          )}
+        </Container>
+      )}
     </Dialog>
   );
 }

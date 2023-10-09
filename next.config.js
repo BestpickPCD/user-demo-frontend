@@ -7,7 +7,7 @@ const nextConfig = {
       "localhost",
     ],
   },
-  reactStrictMode: false,
+
   styledComponents: true,
 };
 

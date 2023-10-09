@@ -1,23 +1,30 @@
-import { Image as MUIImage } from "@mui/icons-material";
-import {
-  Box,
-  Container,
-  ImageList,
-  ImageListItem,
-  Typography,
-  styled,
-} from "@mui/material";
-import { useCallback, useEffect, useState } from "react";
-import { useDropzone } from "react-dropzone";
+import { AttachFile, Image as MUIImage } from "@mui/icons-material";
+import { Box, Container, Typography, styled } from "@mui/material";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { Accept, useDropzone } from "react-dropzone";
 interface UploadFileProps {
-  uploadFile: File[];
+  type: "images" | "files";
+  convertedFiles: {
+    files: any[];
+    images: any[];
+  };
   onSetUploadFile: (file: [File]) => void;
+  onConvertedFile: (
+    value: React.SetStateAction<{
+      files: any[];
+      images: any[];
+    }>
+  ) => void;
 }
+
+const fileFormatAccepted = ["csv", "xlsx", "xls", "docx", "text", "txt"];
+
 const UploadFile = ({
-  uploadFile = [],
+  type = "images",
+  convertedFiles,
   onSetUploadFile,
+  onConvertedFile,
 }: UploadFileProps): JSX.Element => {
-  const [imageUrl, setImageUrl] = useState<any>([]);
   const [files, setFiles] = useState<File[]>([]);
   const [isDrops, setIsDrop] = useState<boolean>(false);
 
@@ -27,6 +34,7 @@ const UploadFile = ({
         e.preventDefault();
         setIsDrop(true);
       });
+
       window.addEventListener("dragleave", () => {
         setIsDrop(false);
       });
@@ -38,42 +46,79 @@ const UploadFile = ({
     return () => setIsDrop(false);
   }, []);
 
-  const onDrop = useCallback((acceptedFiles: any) => {
-    acceptedFiles.forEach((file: File) => {
-      const reader = new FileReader();
-      reader.onabort = () => console.log("file reading was aborted");
-      reader.onerror = () => console.log("file reading has failed");
-      reader.onload = () => {
-        setFiles((prev) => [...prev, file]);
-      };
-      // reader.readAsArrayBuffer(file);
-      reader.onloadend = () => {
-        setImageUrl((prev: any) => [...prev, reader?.result] as any);
-      };
-      reader.readAsDataURL(file);
-    });
-  }, []);
+  useEffect(() => {
+    if (convertedFiles) {
+      if (!convertedFiles.files && !convertedFiles.images) {
+        setFiles([]);
+      }
+    }
+  }, [convertedFiles]);
+
+  const onDrop = useCallback(
+    (acceptedFiles: any) => {
+      acceptedFiles.forEach((file: File) => {
+        if (type === "images") {
+          const reader = new FileReader();
+          reader.onabort = () => console.log("file reading was aborted");
+          reader.onerror = () => console.log("file reading has failed");
+
+          reader.onload = () => {
+            setFiles((prev) => [...prev, file]);
+          };
+          // reader.readAsArrayBuffer(file);
+          reader.onloadend = () => {
+            onConvertedFile((prev) => ({
+              ...prev,
+              images: [...prev.images, reader?.result],
+            }));
+          };
+          reader.readAsDataURL(file);
+        } else {
+          const fileFormat = file?.name?.split(".")?.pop();
+          if (fileFormat) {
+            if (fileFormatAccepted.includes(fileFormat)) {
+              setFiles((prev) => {
+                return [...prev, file];
+              });
+
+              onConvertedFile &&
+                onConvertedFile((rest: any) => ({
+                  ...rest,
+                  files: [...files, file].map((item) => item.name).slice(),
+                }));
+            }
+          }
+        }
+      });
+    },
+    [type, files]
+  );
 
   useEffect(() => {
     onSetUploadFile(files as any);
   }, [files]);
 
-  useEffect(() => {
-    if (uploadFile.length && typeof uploadFile[0] === "string") {
-      setImageUrl(uploadFile.map((file: any) => file) as any);
+  const acceptMemo = useMemo(() => {
+    const acceptedFiles = fileFormatAccepted.map((item) => `.${item}`);
+    if (type === "images") {
+      return { "image/*": [] } as Accept;
     }
-    uploadFile.length === 0 && setImageUrl([]);
-  }, [uploadFile]);
+    return {
+      "text/plain": acceptedFiles,
+      "application/vnd.ms-excel": acceptedFiles,
+    };
+  }, [type]);
 
   const { getRootProps, getInputProps } = useDropzone({
     onDrop,
+    accept: { ...acceptMemo },
   });
 
   return (
     <Box display="flex" justifyContent="center" alignItems="center">
       <Box {...getRootProps({ className: "dropzone" })}>
         <input {...getInputProps()} multiple={true} />
-        <MUIImage />
+        {type === "files" ? <AttachFile /> : <MUIImage />}
       </Box>
       {isDrops && (
         <UploadContainer {...getRootProps({ className: "dropzone" })}>
@@ -97,41 +142,6 @@ const UploadFile = ({
             </Typography>
           </Box>
         </UploadContainer>
-      )}
-
-      {imageUrl && (
-        <ImageList
-          cols={3}
-          rowHeight={100}
-          sx={{
-            margin: "8px 0",
-            position: "absolute",
-            bottom: 60,
-            left: "20px",
-          }}
-        >
-          {imageUrl.map((image: string | undefined, index: number) => (
-            <ImageListItem
-              key={index}
-              sx={{
-                height: "100px",
-                width: "100px",
-                borderRadius: "8px",
-                overflow: "hidden",
-              }}
-            >
-              <img
-                src={image}
-                alt="Uploaded Image"
-                style={{
-                  height: "100px",
-                  width: "100px",
-                  objectFit: "cover",
-                }}
-              />
-            </ImageListItem>
-          ))}
-        </ImageList>
       )}
     </Box>
   );

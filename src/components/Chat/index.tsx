@@ -2,48 +2,38 @@ import {
   useCreateRoomMutation,
   useGetMessageQuery,
   useGetRoomsQuery,
-  useSaveChatMutation,
   useUpdateRoomMutation,
 } from "@/services/chatService";
 import { useCheckUserMutation } from "@/services/gamesService";
-import { useModal } from "@/utils/hooks";
-import Picker from "@emoji-mart/react";
-import { EmojiEmotions, Send } from "@mui/icons-material";
-import {
-  Box,
-  Button,
-  Container,
-  TextField,
-  Typography,
-  styled,
-} from "@mui/material";
+
+import { FilePresent } from "@mui/icons-material";
+import { Box, Container, Tooltip, Typography, styled } from "@mui/material";
+import moment from "moment";
 import Image from "next/image";
+import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
 import io from "socket.io-client";
-import UploadFile from "../UploadFile";
-import Link from "next/link";
-import { useClickOutside } from "@/utils/hooks";
+import BottomHandler from "./BottomHandler";
+import Sended from "./Sended";
+import Modals from "../Modals";
+import ImageModal from "./ImageModal";
 
 const CHAT_URL = process.env.NEXT_PUBLIC_API_CHAT_URL;
 const Chat = () => {
-  const [chat, setChat] = useState<any>({
-    text: "",
-  });
   const socketClient = useRef<any>(null);
   const [currentUser, setCurrentUser] = useState<any>();
-  const [setSendOrSeen, setSentOrSeen] = useState<"Sent" | "Seen" | "">("");
+  const [imageLink, setImageLink] = useState<string>("");
+  const [sentOrSeen, setSentOrSeen] = useState<"Sent" | "Seen" | "">("");
   const [roomId, setRoomId] = useState<any>();
   const router = useRouter();
   const [createRoom] = useCreateRoomMutation();
-  const [saveChat] = useSaveChatMutation();
-  const [uploadFile, setUploadFile] = useState<File[]>([]);
+
   const [chatArr, setChatArr] = useState<any[]>([]);
   const parentRef = useRef<HTMLDivElement | null>(null);
-  const emojiRef = useRef<HTMLDivElement | null>(null);
   const [updateRoom] = useUpdateRoomMutation();
   const [checkUser] = useCheckUserMutation();
-  const { visible, toggle, hide } = useModal();
+
   const { data } = useGetMessageQuery(
     {
       id: currentUser?.id === "player" ? currentUser?.id : roomId?.userId,
@@ -90,25 +80,15 @@ const Chat = () => {
           }
         });
     }
-    if (typeof window !== "undefined") {
-      window?.addEventListener("keydown", (e: any) => {
-        if (e.key === "Escape") {
-          hide();
-        }
-      });
-    }
   }, []);
 
-  const onCreateRoom = async (body: any) => {
-    const response: any = await createRoom(body).unwrap();
-    return response;
-  };
-
   useEffect(() => {
-    socketClient.current = io(String(process.env.NEXT_PUBLIC_API_CHAT_URL), {
-      withCredentials: true,
-    });
+    socketClient.current = io(String(process.env.NEXT_PUBLIC_API_CHAT_URL));
     if (currentUser) {
+      const onCreateRoom = async (body: any) => {
+        const response: any = await createRoom(body).unwrap();
+        return response;
+      };
       if (currentUser.type === "player") {
         onCreateRoom({ ...currentUser }).then((result) => {
           setRoomId(result.data);
@@ -136,6 +116,8 @@ const Chat = () => {
   useEffect(() => {
     if (roomId?._id) {
       socketClient.current.on("messages-back", (message: any) => {
+        console.log(message);
+
         setChatArr((prev) => [
           ...prev,
           {
@@ -151,20 +133,49 @@ const Chat = () => {
           : { newUserMessages: 0 }),
       })
         .unwrap()
-        .then((result) => {
-          refetchRoom();
+        .then(() => {
+          refetchRoom()
+            .unwrap()
+            .then((roomsData) => {
+              if (roomsData?.data?.length > 0) {
+                const room = roomsData?.data?.find(
+                  (item: any) => item._id === roomId?._id
+                );
+                socketClient.current.emit("sent-or-seen", {
+                  roomId: room?._id,
+                  newGuestMessages:
+                    currentUser.type === "player" ? 0 : room?.newGuestMessages,
+                  newUserMessages:
+                    currentUser.type === "agent" ? 0 : room?.newUserMessages,
+                });
+              }
+            });
         });
     }
     socketClient?.current?.on("new-message", (message: any) => {
       refetchRoom();
     });
+    if (currentUser) {
+      socketClient?.current?.on("sent-or-seen", (data: any) => {
+        setSentOrSeen(() => {
+          if (currentUser?.type === "player") {
+            if (data?.newUserMessages > 0) {
+              return "Sent";
+            }
+            return "Seen";
+          }
+          if (data?.newGuestMessages > 0) {
+            return "Sent";
+          }
+          return "Seen";
+        });
+      });
+    }
   }, [roomId, currentUser]);
 
   useEffect(() => {
     if (currentUser?.id) {
       if (currentUser?.type === "player") {
-        console.log("vao day");
-
         socketClient.current.emit("add-user", {
           roomId: roomId?._id,
           userData: currentUser.id,
@@ -182,100 +193,14 @@ const Chat = () => {
     }
   }, [currentUser, roomsData, roomId]);
 
-  const handleChangeText = (e: any) => {
-    setChat((prev: any) => ({
-      ...prev,
-      text: e?.target?.value,
-    }));
-  };
-
-  const handleChat = async () => {
-    if (Boolean(chat.text.trim() || uploadFile.length > 0)) {
-      const data: any = {
-        text: chat.text,
-        image: uploadFile,
-        userId: currentUser.id,
-        oldText: "",
-        hasRead: false,
-        isUpdated: false,
-        isReply: false,
-        status: "pending",
-        roomId: roomId?._id,
-      };
-
-      const { image, ...rest } = data;
-      const formData = new FormData();
-      image.forEach((item: any) => formData.append("image", item));
-      Object.keys(rest).forEach((item) => formData.append(item, data[item]));
-      await saveChat(formData)
-        .unwrap()
-        .then((data) => {
-          socketClient.current.emit("messages", {
-            ...data.data,
-          });
-        });
-
-      const room = roomsData?.data?.find(
-        (item: any) => item._id === roomId._id
-      );
-
-      await updateRoom({
-        roomId: roomId?._id,
-        ...(currentUser.type === "player"
-          ? { newUserMessages: room?.newUserMessages + 1 }
-          : { newGuestMessages: room?.newGuestMessages + 1 }),
-      })
-        .unwrap()
-        .then((data) => {
-          socketClient.current.emit("new-messages", {
-            [`${String(roomId._id)}`]: {
-              roomId: roomId._id,
-              newUserMessages: data?.data?.newUserMessages,
-              newGuestMessages: data?.data?.newGuestMessages,
-            },
-          });
-        });
-
-      setChat((prev: any) => ({
-        ...prev,
-        text: "",
-      }));
-      setUploadFile([]);
-      hide();
-    }
-  };
-
-  const handleKeyDown = async (e: any) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      await handleChat();
-    }
-  };
-
-  const handleSelectEmoji = (value: any) => {
-    setChat((prev: any) => ({
-      ...prev,
-      text: prev.text + value.native,
-    }));
-  };
-
   const onJoinRoom = (item: any) => {
     setRoomId(item);
   };
 
-  const onFocus = async () => {
-    await updateRoom({
-      roomId: roomId?._id,
-      ...(currentUser.type === "player"
-        ? { newGuestMessages: 0 }
-        : { newUserMessages: 0 }),
-    })
-      .unwrap()
-      .then((result) => {
-        refetchRoom();
-      });
+  const onOpenImageModal = (link: string) => {
+    setImageLink(link);
   };
-
-  useClickOutside(emojiRef, hide);
+  console.log(imageLink);
 
   return (
     <Container
@@ -289,7 +214,7 @@ const Chat = () => {
       }}
       ref={parentRef}
     >
-      <Box width="240px" maxWidth="100%" borderRight="1px solid gray">
+      <Box width="20%" minWidth="200px" borderRight="1px solid gray">
         {roomsData?.data?.map((item: any, index: number) => (
           <Box
             key={index}
@@ -302,6 +227,8 @@ const Chat = () => {
             justifyContent="space-between"
             alignItems="center"
             gap="4px"
+            height="48px"
+            maxHeight="48px"
           >
             <Typography
               flex={1}
@@ -333,183 +260,146 @@ const Chat = () => {
           </Box>
         ))}
       </Box>
-      <Box
-        display="flex"
-        flexDirection="column"
-        justifyContent="space-between"
-        flex="1"
-        gap={1}
-        height="calc(100vh - 170px)"
-      >
-        <Box flex="1" height="100%" flexShrink={0}>
-          <div
+      <Box width="80%" gap={1} height="calc(100vh - 170px)">
+        <Box height="100%">
+          <Box
             ref={scrollingDivRef}
             style={{
+              height: "100%",
               maxHeight: "100%",
               overflow: "auto",
               display: "flex",
               flexDirection: "column",
-              gap: "12px",
+              gap: "2px",
             }}
           >
             {chatArr.map((chat: any, index: number) => (
               <Box
                 textAlign={`${chat?.self ? "right" : "left"}`}
                 width="100%"
-                display="grid"
-                gridTemplateColumns="1fr 1fr"
-                gap={1.5}
                 key={index}
               >
                 <Box
-                  gridColumn={chat?.self ? "2" : "1"}
                   display="flex"
                   flexDirection="column"
-                  gap={0.5}
+                  gap={0}
                   paddingX={2}
                   width="100%"
+                  alignItems={`${chat?.self ? "flex-end" : "flex-start"}`}
                 >
-                  {chat?.text && (
-                    <Box
-                      display="flex"
-                      justifyContent={`${chat?.self ? "end" : "start"}`}
-                    >
-                      <Typography
-                        width="max-content"
-                        padding={"8px 16px"}
-                        sx={{ background: "#5eb3ec" }}
-                        color={"#fff"}
-                        borderRadius={8}
+                  <Box width="80%" maxWidth="80%">
+                    {chat?.text && (
+                      <Tooltip
+                        title={moment(chat.createdAt).format("HH:mm DD/MM")}
+                        placement="left"
+                        arrow
                       >
-                        {chat?.text}
-                      </Typography>
-                    </Box>
-                  )}
-                  <Box
-                    display="flex"
-                    width="100%"
-                    justifyContent={`${chat?.self ? "flex-end" : "flex-start"}`}
-                    gap={1}
-                  >
-                    {chat?.image?.map((image: any, index: any) => (
-                      <Box
-                        width={"33%"}
-                        borderRadius={"8px"}
-                        overflow="hidden"
-                        height={120}
-                        key={index}
-                      >
-                        <Link
-                          href={`${CHAT_URL}/${image}`}
-                          rel="noopener noreferrer"
-                          target="_blank"
+                        <Typography
+                          width="max-content"
+                          maxWidth="80%"
+                          padding={"8px 20px"}
+                          sx={{
+                            background: "#5eb3ec",
+                            float: chat?.self ? "right" : "left",
+                          }}
+                          color={"#fff"}
+                          borderRadius={6}
+                          textAlign={`${chat?.self ? "left" : "right"}`}
                         >
-                          <Image
-                            alt="123"
-                            width={200}
-                            height={300}
-                            style={{
-                              objectFit: "cover",
-                              width: "100%",
-                              height: "100%",
-                              maxWidth: "100%",
-                            }}
-                            src={`${CHAT_URL}/${image}`}
-                          />
-                        </Link>
+                          {chat?.text}
+                        </Typography>
+                      </Tooltip>
+                    )}
+                    <Tooltip
+                      title={moment(chat.createdAt).format("HH:mm DD/MM")}
+                      placement="left"
+                      arrow
+                    >
+                      <Box
+                        display="flex"
+                        justifyContent={`${chat?.self ? "right" : "left"}`}
+                        gap={0.5}
+                        sx={{ float: chat?.self ? "right" : "left" }}
+                      >
+                        {chat?.images?.map((image: any, index: any) => (
+                          <Box
+                            borderRadius={"8px"}
+                            overflow="hidden"
+                            height={120}
+                            key={`images-${index}`}
+                            onClick={() =>
+                              onOpenImageModal(`${CHAT_URL}/${image}`)
+                            }
+                          >
+                            <Image
+                              src={`${CHAT_URL}/${image}`}
+                              alt="Upload image"
+                              height={100}
+                              width={100}
+                              style={{
+                                width: "100%",
+                                height: "100%",
+                              }}
+                              crossOrigin="anonymous"
+                            />
+                          </Box>
+                        ))}
+                        {chat?.files?.map((file: any, index: any) => (
+                          <Link
+                            href={`${CHAT_URL}/${file.path}`}
+                            rel="noopener noreferrer"
+                            target="_blank"
+                            key={index}
+                          >
+                            <Box
+                              key={index}
+                              display="flex"
+                              alignItems="center"
+                              gap="4px"
+                              padding={2}
+                              borderRadius={2}
+                              bgcolor="#ccc"
+                            >
+                              <FilePresent />
+                              {file.name}
+                            </Box>
+                          </Link>
+                        ))}
                       </Box>
-                    ))}
+                    </Tooltip>
                   </Box>
-                  {index === chatArr.length - 1 && chat?.self && setSendOrSeen}
+                  {index === chatArr.length - 1 && chat?.self && (
+                    <Typography color="#B0B3B8" fontSize="14px">
+                      <Sended
+                        currentUser={currentUser}
+                        socketClient={socketClient?.current}
+                        chatArr={chatArr}
+                        roomId={roomId}
+                        sentOrSeen={sentOrSeen}
+                      />
+                    </Typography>
+                  )}
                 </Box>
               </Box>
             ))}
-          </div>
-        </Box>
-        <Box
-          display="flex"
-          justifyContent="space-between"
-          alignItems="center"
-          gap="8px"
-          paddingX={2}
-          position="relative"
-          zIndex={1}
-        >
-          {visible && (
-            <div style={{ position: "absolute", bottom: "72px", left: "40px" }}>
-              <Picker
-                onEmojiSelect={handleSelectEmoji}
-                theme="light"
-                previewPosition="none"
-              />
-            </div>
-          )}
-          <div onClick={toggle} ref={emojiRef}>
-            <EmojiEmotions />
-          </div>
-          <UploadFile uploadFile={uploadFile} onSetUploadFile={setUploadFile} />
-          <Box
-            display="flex"
-            justifyContent="space-between"
-            alignItems="center"
-            flex="1"
-            gap="8px"
-          >
-            <CustomTextField
-              value={chat?.text}
-              onChange={handleChangeText}
-              onKeyDown={handleKeyDown}
-              fullWidth
-              sx={{ borderRadius: "20%" }}
-              onFocus={onFocus}
-              multiline={false}
-            />
-            <Button
-              onClick={handleChat}
-              sx={{
-                height: "40px",
-                background: "#2c99e2",
-                minWidth: "unset",
-                borderRadius: "100%",
-                width: "40px",
-              }}
-            >
-              <Send style={{ color: "#fff" }} />
-            </Button>
           </Box>
+          <BottomHandler
+            currentUser={currentUser}
+            roomId={roomId}
+            socketClient={socketClient}
+            roomsData={roomsData}
+            updateRoom={updateRoom}
+            refetchRoom={refetchRoom}
+          />
         </Box>
       </Box>
+      <ImageModal
+        imageLink={imageLink}
+        open={!!imageLink}
+        onClose={() => setImageLink("")}
+      />
     </Container>
   );
 };
 
 export default Chat;
-
-const CustomTextField = styled(TextField)(
-  ({ theme }) => `
-  .MuiInputBase-root {
-    border-radius: 50px
-  }
-`
-);
-
-// .unwrap()
-// .then((data) => {
-//   if (roomId?._id && data && data?.data?.length > 0) {
-//     const room = data?.data?.find(
-//       (item: any) => item._id === roomId._id
-//     );
-//     if (currentUser.type === "player") {
-//       if (room.newUserMessages === 0) {
-//         return setSentOrSeen("Seen");
-//       }
-//       return setSentOrSeen("Sent");
-//     }
-//     if (currentUser.type !== "player") {
-//       if (room.newGuestMessages === 0) {
-//         setSentOrSeen("Seen");
-//       }
-//       setSentOrSeen("Sent");
-//     }
-//   }
-// });
