@@ -11,6 +11,13 @@ export const ChatService = createApi({
         body,
       }),
     }),
+    updateRoom: builder.mutation<any, any>({
+      query: (body) => ({
+        url: "/api/v1/rooms",
+        method: "PUT",
+        body,
+      }),
+    }),
     getRooms: builder.query<any, any>({
       query: (params) => ({
         url: "/api/v1/rooms",
@@ -41,4 +48,5 @@ export const {
   useGetMessageQuery,
   useSaveChatMutation,
   useGetRoomsQuery,
+  useUpdateRoomMutation,
 } = ChatService;
