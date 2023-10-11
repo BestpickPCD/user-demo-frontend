@@ -1,5 +1,6 @@
 import { AttachFile, Image as MUIImage } from "@mui/icons-material";
 import { Box, Container, Typography, styled } from "@mui/material";
+import { log } from "console";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Accept, useDropzone } from "react-dropzone";
 interface UploadFileProps {
@@ -18,7 +19,16 @@ interface UploadFileProps {
 }
 
 const fileFormatAccepted = ["csv", "xlsx", "xls", "docx", "text", "txt"];
+const imageFormatAccepted = ["png", "jpg", "gif", "jpeg", "heic", "tiff"];
 
+const checkFormatted = (format: string) => {
+  if (fileFormatAccepted.includes(format)) {
+    return "files";
+  } else if (imageFormatAccepted.includes(format)) {
+    return "images";
+  }
+  return null;
+};
 const UploadFile = ({
   type = "images",
   convertedFiles,
@@ -57,36 +67,36 @@ const UploadFile = ({
   const onDrop = useCallback(
     (acceptedFiles: any) => {
       acceptedFiles.forEach((file: File) => {
-        if (type === "images") {
-          const reader = new FileReader();
-          reader.onabort = () => console.log("file reading was aborted");
-          reader.onerror = () => console.log("file reading has failed");
+        const fileFormat = file?.name?.split(".")?.pop();
+        if (fileFormat) {
+          const format = checkFormatted(fileFormat);
+          if (format === "images") {
+            const reader = new FileReader();
+            reader.onabort = () => console.log("file reading was aborted");
+            reader.onerror = () => console.log("file reading has failed");
 
-          reader.onload = () => {
-            setFiles((prev) => [...prev, file]);
-          };
-          // reader.readAsArrayBuffer(file);
-          reader.onloadend = () => {
-            onConvertedFile((prev) => ({
-              ...prev,
-              images: [...prev.images, reader?.result],
-            }));
-          };
-          reader.readAsDataURL(file);
-        } else {
-          const fileFormat = file?.name?.split(".")?.pop();
-          if (fileFormat) {
-            if (fileFormatAccepted.includes(fileFormat)) {
-              setFiles((prev) => {
-                return [...prev, file];
-              });
-
-              onConvertedFile &&
-                onConvertedFile((rest: any) => ({
-                  ...rest,
-                  files: [...files, file].map((item) => item.name).slice(),
-                }));
-            }
+            reader.onload = () => {
+              setFiles((prev) => [...prev, file]);
+            };
+            // reader.readAsArrayBuffer(file);
+            reader.onloadend = () => {
+              onConvertedFile((prev) => ({
+                ...prev,
+                images: [...prev.images, reader?.result],
+              }));
+            };
+            reader.readAsDataURL(file);
+          } else if (format === "files") {
+            setFiles((prev) => {
+              return [...prev, file];
+            });
+            onConvertedFile &&
+              onConvertedFile((prev: any) => ({
+                ...prev,
+                files: [...prev.files, file.name],
+              }));
+          } else {
+            console.log("error");
           }
         }
       });
@@ -111,7 +121,15 @@ const UploadFile = ({
 
   const { getRootProps, getInputProps } = useDropzone({
     onDrop,
-    accept: { ...acceptMemo },
+    accept: isDrops
+      ? {
+          "image/*": [],
+          "text/plain": fileFormatAccepted.map((item) => `.${item}`),
+          "application/vnd.ms-excel": fileFormatAccepted.map(
+            (item) => `.${item}`
+          ),
+        }
+      : { ...acceptMemo },
   });
 
   return (
