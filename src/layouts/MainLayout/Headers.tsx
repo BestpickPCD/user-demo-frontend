@@ -15,6 +15,8 @@ import {
   useTheme,
 } from "@mui/material";
 import Link from "next/link";
+import { useRouter } from "next/router";
+import Cookies from "js-cookie";
 const Headers = ({
   onSetLanguage,
   onSetDarkMode,
@@ -22,6 +24,8 @@ const Headers = ({
   language,
 }: any) => {
   const theme = useTheme();
+  const router = useRouter();
+
   const handleChangeLanguage = (e: SelectChangeEvent) => {
     const language = e.target.value as string;
     localStorage.setItem("language", language);
@@ -32,6 +36,8 @@ const Headers = ({
     onSetDarkMode(() => (isDarkMode === "dark" ? "light" : "dark"));
     localStorage.setItem("theme", isDarkMode === "dark" ? "light" : "dark");
   };
+
+  const handleRedirectChat = () => {};
 
   return (
     <Box
@@ -68,6 +74,19 @@ const Headers = ({
             </ListItem>
             <ListItem className="w-full whitespace-nowrap">
               <Link href="/transactions">Betting History</Link>
+            </ListItem>
+            <ListItem className="w-full whitespace-nowrap">
+              <Link
+                href={`${
+                  process.env.NEXT_PUBLIC_CHAT_URL
+                }?token=${localStorage.getItem(
+                  "tokens"
+                )}&user=${localStorage.getItem("user")}`}
+                onClick={handleRedirectChat}
+                target="_blank"
+              >
+                Contacts
+              </Link>
             </ListItem>
           </List>
         </Box>

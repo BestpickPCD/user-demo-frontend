@@ -7,7 +7,7 @@ import {
 import { useCheckUserMutation } from "@/services/gamesService";
 
 import { FilePresent } from "@mui/icons-material";
-import { Box, Container, Tooltip, Typography, styled } from "@mui/material";
+import { Box, Container, Tooltip, Typography } from "@mui/material";
 import moment from "moment";
 import Image from "next/image";
 import Link from "next/link";
@@ -15,9 +15,8 @@ import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
 import io from "socket.io-client";
 import BottomHandler from "./BottomHandler";
-import Sended from "./Sended";
-import Modals from "../Modals";
 import ImageModal from "./ImageModal";
+import Sended from "./Sended";
 
 const CHAT_URL = process.env.NEXT_PUBLIC_API_CHAT_URL;
 const Chat = () => {
@@ -116,8 +115,6 @@ const Chat = () => {
   useEffect(() => {
     if (roomId?._id) {
       socketClient.current.on("messages-back", (message: any) => {
-        console.log(message);
-
         setChatArr((prev) => [
           ...prev,
           {
@@ -200,7 +197,6 @@ const Chat = () => {
   const onOpenImageModal = (link: string) => {
     setImageLink(link);
   };
-  console.log(imageLink);
 
   return (
     <Container
@@ -287,86 +283,122 @@ const Chat = () => {
                   width="100%"
                   alignItems={`${chat?.self ? "flex-end" : "flex-start"}`}
                 >
-                  <Box width="80%" maxWidth="80%">
-                    {chat?.text && (
-                      <Tooltip
-                        title={moment(chat.createdAt).format("HH:mm DD/MM")}
-                        placement="left"
-                        arrow
-                      >
-                        <Typography
-                          width="max-content"
-                          maxWidth="80%"
-                          padding={"8px 20px"}
-                          sx={{
-                            background: "#5eb3ec",
-                            float: chat?.self ? "right" : "left",
-                          }}
-                          color={"#fff"}
-                          borderRadius={6}
-                          textAlign={`${chat?.self ? "left" : "right"}`}
+                  <Box
+                    width="80%"
+                    maxWidth="80%"
+                    display="flex"
+                    flexDirection="column"
+                    gap="2px"
+                    justifyContent={`${chat?.self ? "flex-end" : "flex-start"}`}
+                  >
+                    <Box>
+                      {chat?.text && (
+                        <Tooltip
+                          title={moment(chat.createdAt).format("HH:mm DD/MM")}
+                          placement="left"
+                          arrow
                         >
-                          {chat?.text}
-                        </Typography>
-                      </Tooltip>
-                    )}
-                    <Tooltip
-                      title={moment(chat.createdAt).format("HH:mm DD/MM")}
-                      placement="left"
-                      arrow
+                          <Typography
+                            width="max-content"
+                            maxWidth="80%"
+                            padding={"8px 20px"}
+                            sx={{
+                              background: "#5eb3ec",
+                              float: chat?.self ? "right" : "left",
+                            }}
+                            color={"#fff"}
+                            borderRadius={6}
+                            textAlign={`${chat?.self ? "left" : "right"}`}
+                          >
+                            {chat?.text}
+                          </Typography>
+                        </Tooltip>
+                      )}
+                    </Box>
+                    <Box
+                      display="flex"
+                      justifyContent={`${chat?.self ? "right" : "left"}`}
+                      gap={0.5}
+                      sx={{ float: chat?.self ? "right" : "left" }}
+                      alignItems="flex-end"
                     >
                       <Box
                         display="flex"
-                        justifyContent={`${chat?.self ? "right" : "left"}`}
-                        gap={0.5}
-                        sx={{ float: chat?.self ? "right" : "left" }}
+                        flexDirection="column"
+                        gap={0.25}
+                        width="100%"
                       >
-                        {chat?.images?.map((image: any, index: any) => (
+                        <Box>
                           <Box
-                            borderRadius={"8px"}
-                            overflow="hidden"
-                            height={120}
-                            key={`images-${index}`}
-                            onClick={() =>
-                              onOpenImageModal(`${CHAT_URL}/${image}`)
-                            }
+                            style={{
+                              display: "flex",
+                              justifyContent: `${
+                                chat?.self ? "right" : "left"
+                              }`,
+                            }}
                           >
-                            <Image
-                              src={`${CHAT_URL}/${image}`}
-                              alt="Upload image"
-                              height={100}
-                              width={100}
-                              style={{
-                                width: "100%",
-                                height: "100%",
-                              }}
-                              crossOrigin="anonymous"
-                            />
+                            {chat?.images?.map((image: any, index: any) => (
+                              <Box
+                                borderRadius={"8px"}
+                                overflow="hidden"
+                                height={140}
+                                key={`images-${index}`}
+                                onClick={() =>
+                                  onOpenImageModal(`${CHAT_URL}/${image}`)
+                                }
+                              >
+                                <Image
+                                  src={`${CHAT_URL}/${image}`}
+                                  alt="Upload image"
+                                  height={100}
+                                  width={100}
+                                  style={{
+                                    width: "100%",
+                                    height: "100%",
+                                  }}
+                                  crossOrigin="anonymous"
+                                />
+                              </Box>
+                            ))}
                           </Box>
-                        ))}
-                        {chat?.files?.map((file: any, index: any) => (
-                          <Link
-                            href={`${CHAT_URL}/${file.path}`}
-                            rel="noopener noreferrer"
-                            target="_blank"
-                            key={index}
+                        </Box>
+                        <Tooltip
+                          title={moment(chat.createdAt).format("HH:mm DD/MM")}
+                          placement="left"
+                          arrow
+                        >
+                          <Box
+                            display="flex"
+                            gap={0.25}
+                            sx={{
+                              justifyContent: chat?.self ? "right" : "left",
+                            }}
                           >
-                            <Box
-                              key={index}
-                              display="flex"
-                              alignItems="center"
-                              gap="4px"
-                              padding={2}
-                              borderRadius={2}
-                              bgcolor="#ccc"
-                            >
-                              <FilePresent />
-                              {file.name}
-                            </Box>
-                          </Link>
-                        ))}
+                            {chat?.files?.map((file: any, index: any) => (
+                              <Link
+                                href={`${CHAT_URL}/${file.path}`}
+                                rel="noopener noreferrer"
+                                target="_blank"
+                                key={index}
+                              >
+                                <Box
+                                  key={index}
+                                  display="flex"
+                                  alignItems="center"
+                                  gap="4px"
+                                  padding={2}
+                                  borderRadius={2}
+                                  bgcolor="#ccc"
+                                >
+                                  <FilePresent />
+                                  {file.name}
+                                </Box>
+                              </Link>
+                            ))}
+                          </Box>
+                        </Tooltip>
                       </Box>
-                    </Tooltip>
+                    </Box>
                   </Box>
                   {index === chatArr.length - 1 && chat?.self && (
                     <Typography color="#B0B3B8" fontSize="14px">

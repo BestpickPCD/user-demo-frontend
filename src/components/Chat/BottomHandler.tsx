@@ -35,6 +35,8 @@ const BottomHandler = ({
     images: [],
   });
 
+  console.log(convertedFiles);
+
   useEffect(() => {
     if (typeof window !== "undefined") {
       const onEscape = (e: any) => {
