@@ -87,7 +87,9 @@ const FormRegister = (): JSX.Element => {
   return (
     <>
       <Head>
-        <title>Sign Up</title>
+        <title>
+          {<FormattedMessage id="label.sign.up"></FormattedMessage>}
+        </title>
       </Head>
       <AuthLayout>
         <Typography
@@ -97,7 +99,7 @@ const FormRegister = (): JSX.Element => {
           className="flex justify-center"
           color="color.text"
         >
-          Sign Up
+          <FormattedMessage id="label.sign.up" />
         </Typography>
         <Box
           component="form"
@@ -108,7 +110,7 @@ const FormRegister = (): JSX.Element => {
           <TextField
             required
             fullWidth
-            label="First name"
+            label={<FormattedMessage id="label.first.name" />}
             autoFocus
             sx={{ my: 1 }}
             error={!!errors["firstName"]}
@@ -119,7 +121,7 @@ const FormRegister = (): JSX.Element => {
           <TextField
             required
             fullWidth
-            label="Last name"
+            label={<FormattedMessage id="label.last.name" />}
             sx={{ my: 1 }}
             error={!!errors["lastName"]}
             helperText={errors["lastName"] ? errors["lastName"].message : ""}
@@ -129,7 +131,7 @@ const FormRegister = (): JSX.Element => {
           <TextField
             required
             fullWidth
-            label="Email"
+            label={<FormattedMessage id="label.email" />}
             type="email"
             sx={{ my: 1 }}
             error={!!errors["email"]}
@@ -150,7 +152,7 @@ const FormRegister = (): JSX.Element => {
           <TextField
             required
             fullWidth
-            label="Password"
+            label={<FormattedMessage id="label.password" />}
             type="password"
             sx={{ my: 1 }}
             error={!!errors["password"]}
@@ -161,7 +163,7 @@ const FormRegister = (): JSX.Element => {
           <TextField
             required
             fullWidth
-            label="Confirm Password"
+            label={<FormattedMessage id="label.confirm.password" />}
             type="password"
             sx={{ my: 1 }}
             error={!!errors["confirmPassword"]}
@@ -179,7 +181,7 @@ const FormRegister = (): JSX.Element => {
             sx={{ mt: 3, mb: 2, fontWeight: 600 }}
             loading={isLoading}
           >
-            Sign Up
+            <FormattedMessage id="label.sign.up" />
           </LoadingButton>
           <Grid container>
             <Box
@@ -197,13 +199,13 @@ const FormRegister = (): JSX.Element => {
                 className="w-full flex justify-end items-center gap-1"
               >
                 <Typography color="color.text">
-                  Already have an account?{" "}
+                  <FormattedMessage id="label.have.account" />
                 </Typography>
                 <Typography
                   className="whitespace-nowrap text-right"
                   color="color.text"
                 >
-                  Sign In
+                  <FormattedMessage id="label.sign.in" />
                 </Typography>
               </Link>
             </Box>

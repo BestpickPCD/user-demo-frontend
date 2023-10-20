@@ -1,22 +1,22 @@
 import {
   Box,
   Container,
-  FormControl,
   FormControlLabel,
-  InputLabel,
   List,
   ListItem,
   MenuItem,
   Select,
-  SelectChangeEvent,
   Switch,
   Typography,
+  keyframes,
   styled,
   useTheme,
 } from "@mui/material";
 import Link from "next/link";
+import { AccountCircle as User } from "@mui/icons-material";
 import { useRouter } from "next/router";
-import Cookies from "js-cookie";
+import { useEffect, useMemo, useState } from "react";
+import { FormattedMessage } from "react-intl";
 const Headers = ({
   onSetLanguage,
   onSetDarkMode,
@@ -24,9 +24,14 @@ const Headers = ({
   language,
 }: any) => {
   const theme = useTheme();
+  const [navLink, setNavLink] = useState("");
   const router = useRouter();
 
-  const handleChangeLanguage = (e: SelectChangeEvent) => {
+  useEffect(() => {
+    setNavLink(router.pathname);
+  }, [router]);
+
+  const handleChangeLanguage = (e: any) => {
     const language = e.target.value as string;
     localStorage.setItem("language", language);
     onSetLanguage(language);
@@ -38,6 +43,114 @@ const Headers = ({
   };
 
   const handleRedirectChat = () => {};
+
+  const redirectLinkMemo = useMemo(() => {
+    const isHaveToken = !!localStorage.getItem("tokens");
+    if (isHaveToken) {
+      return "/games";
+    }
+    return "/login";
+  }, []);
+
+  const navLinkMemo = useMemo(() => {
+    const isHaveToken = !!localStorage.getItem("tokens");
+    return isHaveToken ? (
+      <NavList className="flex justify-center items-center">
+        <ListItem className={`w-full ${navLink === "/games" ? "active" : ""}`}>
+          <Link href="/games">
+            <FormattedMessage id="label.games" />
+          </Link>
+        </ListItem>
+        <ListItem
+          className={`w-full whitespace-nowrap ${
+            navLink === "/transactions" ? "active" : ""
+          }`}
+        >
+          <Link href="/transactions">
+            <FormattedMessage id="label.history" />
+          </Link>
+        </ListItem>
+        <ListItem className="w-full whitespace-nowrap">
+          <Link
+            href={`${
+              process.env.NEXT_PUBLIC_CHAT_URL
+            }?token=${localStorage.getItem(
+              "tokens"
+            )}&user=${localStorage.getItem("user")}`}
+            onClick={handleRedirectChat}
+            target="_blank"
+          >
+            <FormattedMessage id="label.contacts" />
+          </Link>
+        </ListItem>
+      </NavList>
+    ) : (
+      <div></div>
+    );
+  }, [navLink]);
+
+  const username = useMemo(() => {
+    const userLocal = localStorage.getItem("user");
+    if (userLocal) {
+      return JSON.parse(userLocal)?.name;
+    }
+    return "";
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem("user");
+    localStorage.removeItem("tokens");
+    router.push("/login");
+  };
+
+  const userSettingMemo = useMemo(() => {
+    const userLocal = localStorage.getItem("tokens");
+    if (userLocal) {
+      return (
+        <Box
+          width="160px"
+          position="relative"
+          sx={{
+            cursor: "pointer",
+            "&:hover": {
+              ".user-setting": {
+                display: "block",
+              },
+            },
+          }}
+        >
+          <Box display="flex" alignItems="center" gap="4px">
+            <Typography
+              width="120px"
+              textOverflow="ellipsis"
+              whiteSpace="nowrap"
+              overflow="hidden"
+            >
+              {username}
+            </Typography>
+            <User />
+          </Box>
+          <UserSetting
+            position="absolute"
+            display="none"
+            className="user-setting"
+            bgcolor={theme.palette.text.secondary}
+            width="100%"
+            left="0"
+          >
+            <List>
+              <ListItem
+                sx={{ justifyContent: "flex-end", padding: "0 8px" }}
+                onClick={handleLogout}
+              >
+                <Typography color="color.contrastText">Logout</Typography>
+              </ListItem>
+            </List>
+          </UserSetting>
+        </Box>
+      );
+    }
+  }, [theme, username]);
 
   return (
     <Box
@@ -56,45 +169,26 @@ const Headers = ({
           height: "80px",
         }}
       >
-        <Link href="/">
+        <Link href={redirectLinkMemo}>
           <Typography
+            whiteSpace="nowrap"
             fontWeight={600}
             fontSize={24}
             letterSpacing={2}
             textTransform="uppercase"
+            sx={{ cursor: "pointer" }}
           >
             Best Pick
           </Typography>
         </Link>
 
-        <Box>
-          <List className="flex justify-center items-center">
-            <ListItem className="w-full">
-              <Link href="/games">Games</Link>
-            </ListItem>
-            <ListItem className="w-full whitespace-nowrap">
-              <Link href="/transactions">Betting History</Link>
-            </ListItem>
-            <ListItem className="w-full whitespace-nowrap">
-              <Link
-                href={`${
-                  process.env.NEXT_PUBLIC_CHAT_URL
-                }?token=${localStorage.getItem(
-                  "tokens"
-                )}&user=${localStorage.getItem("user")}`}
-                onClick={handleRedirectChat}
-                target="_blank"
-              >
-                Contacts
-              </Link>
-            </ListItem>
-          </List>
-        </Box>
+        <Box>{navLinkMemo}</Box>
+
         <Box
           display="flex"
           justifyContent="space-between"
           alignItems="center"
-          gap={2}
+          gap={0.5}
         >
           <FormControlLabel
             sx={{ margin: 0 }}
@@ -106,19 +200,17 @@ const Headers = ({
             }
             label={undefined}
           />
-          <Box sx={{ minWidth: 150 }}>
-            <FormControl fullWidth>
-              <InputLabel>Language</InputLabel>
-              <Select
-                value={language}
-                label="Language"
-                onChange={handleChangeLanguage}
-              >
-                <MenuItem value="en">English</MenuItem>
-                <MenuItem value="ko">Korean</MenuItem>
-              </Select>
-            </FormControl>
+          <Box>
+            <SelectLanguage
+              value={language}
+              label="Language"
+              onChange={handleChangeLanguage}
+            >
+              <MenuItem value="en">English</MenuItem>
+              <MenuItem value="ko">Korean</MenuItem>
+            </SelectLanguage>
           </Box>
+          {userSettingMemo}
         </Box>
       </Container>
     </Box>
@@ -168,3 +260,64 @@ const MaterialUISwitch = styled(Switch)(({ theme }) => ({
     borderRadius: 20 / 2,
   },
 }));
+
+const NavList = styled(List)(({ theme }) => ({
+  li: {
+    a: {
+      borderBottom: "2px solid transparent",
+    },
+    "&.active": {
+      a: {
+        borderBottom: "2px solid #ccc",
+        fontWeight: "600",
+      },
+    },
+  },
+}));
+
+const SelectLanguage = styled(Select)({
+  width: "100px",
+  fieldset: {
+    border: "none",
+  },
+});
+
+const spin = keyframes`
+   from {
+    transform: scale(0);
+  }
+  to {
+    transform: scale(1);
+  }
+`;
+
+const UserSetting = styled(Box)({
+  cursor: "pointer",
+  transformOrigin: "top right",
+  animation: `${spin} ease-in 0.2s`,
+  borderRadius: "2px",
+  top: "calc(100% + 8px)",
+  "&::before": {
+    content: '""',
+    width: "100%",
+    height: "20px",
+    position: "absolute",
+    left: "0",
+    top: "-12px",
+    background: "transparent",
+  },
+  ul: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "2px",
+    li: {
+      padding: "4px 8px",
+      transition: " opacity 0.2s ease,  background 0.2s ease, color 0.3s ease",
+      "&:hover": {
+        opacity: 0.8,
+        background: "#828282",
+        color: "#fff",
+      },
+    },
+  },
+});

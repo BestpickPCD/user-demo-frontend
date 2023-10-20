@@ -28,7 +28,6 @@ interface TableProps<D, P> {
 }
 
 const TableComponent = ({
-  title,
   data = [],
   tableHeader = [
     {
@@ -36,10 +35,7 @@ const TableComponent = ({
       title: "Title",
     },
   ],
-  headerTitle = "",
-  headerSubtitle = "",
   isLoading = false,
-  breadcrumbs,
   pagination,
   tableFilter,
   totalItems,
@@ -52,14 +48,6 @@ const TableComponent = ({
 }: TableProps<any, PaginationAndSort>): JSX.Element => {
   return (
     <Box sx={{ marginTop: 10 }}>
-      <PageTitleWrapper>
-        <PageHeader
-          headerTitle={headerTitle}
-          headerSubtitle={headerSubtitle}
-          onOpenModal={onOpenModal}
-          breadcrumbs={breadcrumbs || []}
-        />
-      </PageTitleWrapper>
       <Container maxWidth="lg">
         <Grid
           container

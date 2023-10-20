@@ -77,7 +77,9 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>Sign In</title>
+        <title>
+          <FormattedMessage id="label.sign.in" />
+        </title>
       </Head>
       <AuthLayout>
         <Typography
@@ -87,7 +89,7 @@ export default function Home() {
           className="flex justify-center"
           color="color.text"
         >
-          Sign In
+          <FormattedMessage id="label.sign.in" />
         </Typography>
         <Box
           component="form"
@@ -109,7 +111,7 @@ export default function Home() {
           <TextField
             required
             fullWidth
-            label="Password"
+            label={<FormattedMessage id="label.password" />}
             type="password"
             error={!!errors["password"]}
             helperText={errors["password"] ? errors["password"].message : ""}
@@ -117,7 +119,11 @@ export default function Home() {
           />
           <FormControlLabel
             control={<Checkbox value="remember" color="primary" />}
-            label={<Typography color="color.text">Remember me</Typography>}
+            label={
+              <Typography color="color.text">
+                <FormattedMessage id="label.remember.me" />
+              </Typography>
+            }
           />
           <LoadingButton
             type="submit"
@@ -126,7 +132,7 @@ export default function Home() {
             sx={{ mt: 3, mb: 2, fontWeight: 600 }}
             loading={isLoading}
           >
-            Sign In
+            <FormattedMessage id="label.sign.in" />
           </LoadingButton>
           <Grid container>
             <Grid
@@ -139,7 +145,13 @@ export default function Home() {
               }}
             >
               <Link href="/">
-                <Typography color="color.text">Forgot Password</Typography>
+                <Typography
+                  color="color.text"
+                  whiteSpace="nowrap"
+                  fontSize="14px"
+                >
+                  <FormattedMessage id="label.forget.password" />
+                </Typography>
               </Link>
             </Grid>
             <Grid
@@ -151,15 +163,23 @@ export default function Home() {
                 },
               }}
             >
-              <Link href="/register" className="w-full flex justify-end gap-1">
-                <Typography color="color.text" whiteSpace="nowrap">
-                  Don&apos;t have an account?
+              <Link
+                href="/register"
+                className="w-full flex justify-end gap-1 flex-wrap"
+              >
+                <Typography
+                  color="color.text"
+                  whiteSpace="nowrap"
+                  fontSize="14px"
+                >
+                  <FormattedMessage id="label.dont.account" />
                 </Typography>
                 <Typography
                   className="whitespace-nowrap text-right"
                   color="color.text"
+                  fontSize="14px"
                 >
-                  Sign Up
+                  <FormattedMessage id="label.sign.up" />
                 </Typography>
               </Link>
             </Grid>

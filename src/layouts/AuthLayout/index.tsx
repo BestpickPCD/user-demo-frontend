@@ -1,7 +1,7 @@
 import Image from "next/image";
 import React from "react";
 import { imgs } from "../../../public";
-import { useTheme } from "@mui/material";
+import { Container, useTheme } from "@mui/material";
 interface AuthLayoutProps {
   children: React.ReactNode;
 }
@@ -24,9 +24,11 @@ const AuthLayout = ({ children }: AuthLayoutProps) => {
               : "rgba(0,0,0, 0.3)",
         }}
       >
-        <div
-          className="w-[40%]  text-white p-12 rounded-lg"
-          style={{
+        <Container
+          className="text-white p-12 rounded-lg "
+          maxWidth="sm"
+          sx={{
+            width: "90%",
             background:
               theme.palette.mode === "light"
                 ? "rgba(255,255,255, 0.8)"
@@ -34,7 +36,7 @@ const AuthLayout = ({ children }: AuthLayoutProps) => {
           }}
         >
           {children}
-        </div>
+        </Container>
       </div>
     </div>
   );

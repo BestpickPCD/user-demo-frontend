@@ -34,5 +34,20 @@
   "label.search.term": "Search term here",
   "label.languages": "Languages",
   "label.from": "From",
-  "label.to": "To"
+  "label.to": "To",
+  "label.forget.password": "Forget Password",
+  "label.dont.account": "Don't have an account?",
+  "label.have.account": "Already have an account?",
+  "label.sign.in": "Sign In",
+  "label.sign.up": "Sign Up",
+  "label.first.name": "First name",
+  "label.last.name": "Last name",
+  "label.password": "Password",
+  "label.confirm.password": "Confirm Password",
+  "label.remember.me": "Remember me",
+  "label.email": "Email",
+  "label.title": "Title",
+  "label.games": "Games",
+  "label.history": "Betting History",
+  "label.contacts": "Contacts"
 }

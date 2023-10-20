@@ -31,29 +31,37 @@ export const baseQueryWithReAuth: BaseQueryFn<
 > = async (args, api, extraOptions) => {
   let result = await baseQuery(args, api, extraOptions);
   if (result.error && result.error.status === 401) {
-    const refreshArgs = {
-      url: "/get-refresh-token",
-      body: {
-        refreshToken: JSON.parse(localStorage.getItem("tokens") || "").token
-          .refreshToken,
-      },
-      method: "POST",
-    };
-    try {
-      const refreshResult = await baseQuery(refreshArgs, api, extraOptions);
-      if (refreshResult.data) {
-        localStorage.setItem(
-          "tokens",
-          JSON.stringify({ token: refreshResult.data })
-        );
-        result = await baseQuery(args, api, extraOptions);
-        console.log(result);
-      } else {
+    const token = localStorage.getItem("tokens");
+    if (!!token) {
+      const refreshArgs = {
+        url: "/get-refresh-token",
+        body: {
+          refreshToken: JSON.parse(token).token.refreshToken,
+        },
+        method: "POST",
+      };
+      try {
+        const refreshResult = await baseQuery(refreshArgs, api, extraOptions);
+        if (refreshResult.data) {
+          localStorage.setItem(
+            "tokens",
+            JSON.stringify({ token: refreshResult.data })
+          );
+          result = await baseQuery(args, api, extraOptions);
+        } else {
+          window.location.href = "/";
+          localStorage.removeItem("tokens");
+          localStorage.removeItem("user");
+        }
+      } catch (error) {
         window.location.href = "/";
         localStorage.removeItem("tokens");
+        localStorage.removeItem("user");
       }
-    } catch (error) {
-      console.log(error);
+    } else {
+      window.location.href = "/";
+      localStorage.removeItem("tokens");
+      localStorage.removeItem("user");
     }
   }
   return result;

@@ -34,5 +34,20 @@
   "label.search.term": "여기에 검색어 입력",
   "label.languages": "언어",
   "label.from": "시작",
-  "label.to": "종료"
+  "label.to": "종료",
+  "label.sign.in": "로그인",
+  "label.sign.up": "가입하기",
+  "label.first.name": "이름",
+  "label.last.name": "성",
+  "label.password": "비밀번호",
+  "label.confirm.password": "비밀번호 확인",
+  "label.forget.password": "비밀번호를 잊으셨나요?",
+  "label.dont.account": "계정이 없으신가요?",
+  "label.have.account": "이미 계정이 있으신가요?",
+  "label.remember.me": "나를 기억해주세요",
+  "label.email": "이메일",
+  "label.title": "제목",
+  "label.games": "게임",
+  "label.history": "베팅 기록",
+  "label.contacts": "연락처"
 }

@@ -55,6 +55,7 @@ function MyApp(props: MyAppProps) {
       router.push("/login");
     }
   }, []);
+
   return (
     <Provider store={store}>
       <IntlProvider locale="en" messages={(messages as any)[language || "en"]}>

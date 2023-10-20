@@ -68,8 +68,6 @@ const getStatusLabel = (status: string): JSX.Element => {
     },
   };
   if (data[status]) {
-    console.log(data[status]);
-
     const { text, color } = data[status];
     return <Label color={color}>{text}</Label>;
   }
