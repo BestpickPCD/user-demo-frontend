@@ -1,5 +1,6 @@
 import {
   Box,
+  Button,
   Container,
   FormControlLabel,
   List,
@@ -17,6 +18,8 @@ import { AccountCircle as User } from "@mui/icons-material";
 import { useRouter } from "next/router";
 import { useEffect, useMemo, useState } from "react";
 import { FormattedMessage } from "react-intl";
+import TransactionModal from "@/modules/Transactions/TransactionModal";
+import { useModal } from "@/utils/hooks";
 const Headers = ({
   onSetLanguage,
   onSetDarkMode,
@@ -26,7 +29,7 @@ const Headers = ({
   const theme = useTheme();
   const [navLink, setNavLink] = useState("");
   const router = useRouter();
-
+  const [type, setType] = useState("");
   useEffect(() => {
     setNavLink(router.pathname);
   }, [router]);
@@ -43,7 +46,7 @@ const Headers = ({
   };
 
   const handleRedirectChat = () => {};
-
+  const { hide, show, visible } = useModal();
   const redirectLinkMemo = useMemo(() => {
     const isHaveToken = !!localStorage.getItem("tokens");
     if (isHaveToken) {
@@ -51,6 +54,11 @@ const Headers = ({
     }
     return "/login";
   }, []);
+
+  const onOpenModal = (type: string) => {
+    show();
+    setType(type);
+  };
 
   const navLinkMemo = useMemo(() => {
     const isHaveToken = !!localStorage.getItem("tokens");
@@ -82,6 +90,12 @@ const Headers = ({
           >
             <FormattedMessage id="label.contacts" />
           </Link>
+        </ListItem>
+        <ListItem className="w-full whitespace-nowrap">
+          <Button onClick={() => onOpenModal("deposit")}>Deposit</Button>
+        </ListItem>
+        <ListItem className="w-full whitespace-nowrap">
+          <Button onClick={() => onOpenModal("withdraw")}>WithDraw</Button>
         </ListItem>
       </NavList>
     ) : (
@@ -212,6 +226,13 @@ const Headers = ({
           </Box>
           {userSettingMemo}
         </Box>
+
+        <TransactionModal
+          actionType={type}
+          open={visible}
+          onClose={hide}
+          refetch={() => console.log(123)}
+        />
       </Container>
     </Box>
   );
@@ -267,7 +288,7 @@ const NavList = styled(List)(({ theme }) => ({
       borderBottom: "2px solid transparent",
     },
     "&.active": {
-      a: {
+      "a, button": {
         borderBottom: "2px solid #ccc",
         fontWeight: "600",
       },

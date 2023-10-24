@@ -77,20 +77,6 @@ const getStatusLabel = (status: string): JSX.Element => {
 const TransactionTable = (): TransactionTableProps => {
   const tableBody = (item: Transactions): TableBody[] => [
     {
-      align: "inherit",
-      children: (
-        <>
-          <Typography variant="body1" color="text.primary" noWrap>
-            {item.senderUsername}
-          </Typography>
-        </>
-      ),
-    },
-    {
-      align: "inherit",
-      children: <>{item.receiverUsername}</>,
-    },
-    {
       align: "right",
       children: (
         <>
@@ -133,16 +119,6 @@ const TransactionTable = (): TransactionTableProps => {
     },
   ];
   const tableHeader: TableHeader[] = [
-    {
-      align: "inherit",
-      title: "label.sender.name",
-      name: "senderName",
-    },
-    {
-      align: "inherit",
-      title: "label.receiver.name",
-      name: "receiverName",
-    },
     {
       align: "right",
       title: "label.amount",

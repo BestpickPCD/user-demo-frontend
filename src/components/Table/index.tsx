@@ -49,6 +49,14 @@ const TableComponent = ({
   return (
     <Box sx={{ marginTop: 10 }}>
       <Container maxWidth="lg">
+        <Box py={2}>
+          <PageHeader
+            onOpenModal={onOpenModal}
+            headerTitle={""}
+            headerSubtitle={""}
+            breadcrumbs={[]}
+          />
+        </Box>
         <Grid
           container
           direction="row"

@@ -2,9 +2,10 @@ import TableComponent from "@/components/Table";
 import { Transactions } from "@/models";
 import { useGetTransactionQuery } from "@/services/gamesService";
 import { formatToISOString, onSortTable } from "@/utils";
-import { useModal, useToast } from "@/utils/hooks";
 import { useEffect, useState } from "react";
+import TransactionModal from "./TransactionModal";
 import TransactionTable from "./TransactionTable";
+import { useModal } from "@/utils/hooks";
 
 export interface PaginationAndSort {
   page: number;
@@ -25,7 +26,7 @@ interface TransactionPagination extends PaginationAndSort {
 const title = "title.transactions-management";
 const TransactionManagement = (): JSX.Element => {
   const { tableBody, tableHeader, tableFilter } = TransactionTable();
-
+  const { visible, hide, show } = useModal();
   const [data, setData] = useState<Transactions[]>([]);
   const [pagination, setPagination] = useState<TransactionPagination>({
     page: 0,
@@ -69,6 +70,9 @@ const TransactionManagement = (): JSX.Element => {
     }
   }, [transactionData, pagination.sortBy, pagination.sortDirection]);
 
+  const onCreate = () => {
+    show();
+  };
   return (
     <>
       <TableComponent
@@ -80,6 +84,7 @@ const TransactionManagement = (): JSX.Element => {
         isLoading={isFetching}
         pagination={pagination}
         onPagination={setPagination}
+        onOpenModal={onCreate}
         tableFilter={tableFilter({
           type: {
             value: pagination.type,
@@ -104,6 +109,7 @@ const TransactionManagement = (): JSX.Element => {
           },
         })}
       />
+      <TransactionModal open={visible} onClose={hide} refetch={refetch} />
     </>
   );
 };

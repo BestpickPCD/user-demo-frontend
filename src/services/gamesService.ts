@@ -37,6 +37,13 @@ export const GamesService = createApi({
         body,
       }),
     }),
+    createTransaction: builder.mutation<any, any>({
+      query: (body) => ({
+        url: "/transaction",
+        method: "POST",
+        body,
+      }),
+    }),
   }),
 });
 
@@ -44,4 +51,5 @@ export const {
   useGetGamesQuery,
   useGetTransactionQuery,
   useCheckUserMutation,
+  useCreateTransactionMutation,
 } = GamesService;

@@ -1,5 +1,6 @@
 import AuthLayout from "@/layouts/AuthLayout";
 import { useLoginMutation } from "@/services/authService";
+import { useToast } from "@/utils/hooks";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { LoadingButton } from "@mui/lab";
 import {
@@ -34,6 +35,7 @@ const schema = yup.object().shape({
 });
 export default function Home() {
   const [onLogin, { isLoading }] = useLoginMutation();
+  const { message, notify } = useToast();
   const router = useRouter();
   const {
     register,
@@ -67,10 +69,19 @@ export default function Home() {
         );
       }
     } catch (error: any) {
-      if ((error.data.message as any) === "NOT_FOUND") {
-        console.log("error");
+      if (
+        (error.data.message as any) === "NOT_FOUND" ||
+        error.data.message === "INVALID_CREDENTIALS"
+      ) {
+        return notify({
+          message: "Username or password incorrect",
+          type: "error",
+        });
       }
-      console.log("error");
+      return notify({
+        message: message.ERROR,
+        type: "error",
+      });
     }
   };
 
