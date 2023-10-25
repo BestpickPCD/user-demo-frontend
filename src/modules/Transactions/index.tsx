@@ -6,6 +6,9 @@ import { useEffect, useState } from "react";
 import TransactionModal from "./TransactionModal";
 import TransactionTable from "./TransactionTable";
 import { useModal } from "@/utils/hooks";
+import { RootState } from "@/app/store";
+import { useDispatch, useSelector } from "react-redux";
+import { isSubmitTransaction as isSubmitTransactionAction } from "@/app/slices/commonSlices";
 
 export interface PaginationAndSort {
   page: number;
@@ -26,7 +29,11 @@ interface TransactionPagination extends PaginationAndSort {
 const title = "title.transactions-management";
 const TransactionManagement = (): JSX.Element => {
   const { tableBody, tableHeader, tableFilter } = TransactionTable();
+  const dispatch = useDispatch();
   const { visible, hide, show } = useModal();
+  const { isSubmitTransaction } = useSelector(
+    (state: RootState) => state.common
+  );
   const [data, setData] = useState<Transactions[]>([]);
   const [pagination, setPagination] = useState<TransactionPagination>({
     page: 0,
@@ -69,6 +76,14 @@ const TransactionManagement = (): JSX.Element => {
       );
     }
   }, [transactionData, pagination.sortBy, pagination.sortDirection]);
+
+  useEffect(() => {
+    if (isSubmitTransaction) {
+      refetch().then(() => {
+        return dispatch(isSubmitTransactionAction(false));
+      });
+    }
+  }, [isSubmitTransaction]);
 
   const onCreate = () => {
     show();

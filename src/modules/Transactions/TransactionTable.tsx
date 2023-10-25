@@ -81,7 +81,11 @@ const TransactionTable = (): TransactionTableProps => {
       children: (
         <>
           <Typography variant="body1" color="text.primary" noWrap>
-            {item.amount}
+            {item.type === "bet" ||
+            item.type === "win" ||
+            item.type === "cancel"
+              ? item.amount
+              : Number(item.amount) * -1}
           </Typography>
         </>
       ),

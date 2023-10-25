@@ -44,6 +44,11 @@ export const GamesService = createApi({
         body,
       }),
     }),
+    userInfo: builder.query<any, { id: number }>({
+      query: ({ id }) => ({
+        url: `/user/${id}`,
+      }),
+    }),
   }),
 });
 
@@ -52,4 +57,5 @@ export const {
   useGetTransactionQuery,
   useCheckUserMutation,
   useCreateTransactionMutation,
+  useUserInfoQuery,
 } = GamesService;

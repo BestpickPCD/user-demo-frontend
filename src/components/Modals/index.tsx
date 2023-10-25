@@ -29,7 +29,7 @@ function Modals({
 }: ModalProps): JSX.Element {
   return (
     <Dialog onClose={onClose} open={open} {...props}>
-      {modalTitle && <DialogTitle variant="h4">{modalTitle}</DialogTitle>}
+      {modalTitle && <DialogTitle variant="h6">{modalTitle}</DialogTitle>}
       {modalTitle && <Divider />}
       <List sx={{ pt: 0 }}>{children}</List>
       <Divider />

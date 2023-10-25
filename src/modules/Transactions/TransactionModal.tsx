@@ -8,6 +8,8 @@ import { Select, TextField } from "../../components/MUIComponents";
 import Modals from "../../components/Modals";
 import { useCreateTransactionMutation } from "../../services/gamesService";
 import { useToast } from "../../utils/hooks";
+import { useDispatch } from "react-redux";
+import { isSubmitTransaction } from "@/app/slices/commonSlices";
 
 const transactionTypes = ["deposit", "withdraw"];
 
@@ -65,6 +67,13 @@ const TransactionModal = ({
   refetch,
 }: ModalProps): JSX.Element => {
   const { notify, message } = useToast();
+  const dispatch = useDispatch();
+
+  const user = localStorage.getItem("user") || "";
+  let parseUser;
+  if (user) {
+    parseUser = JSON.parse(user || "");
+  }
 
   const {
     register,
@@ -76,7 +85,7 @@ const TransactionModal = ({
   } = useForm({
     resolver: yupResolver(schema),
     defaultValues: {
-      userId: JSON.parse(localStorage.getItem("user") || "")?.id || "",
+      userId: parseUser?.id || "",
       amount: 0,
       type: actionType || "",
     },
@@ -97,6 +106,7 @@ const TransactionModal = ({
         reset();
         onClose();
         refetch();
+        dispatch(isSubmitTransaction(true));
       }
     } catch (error: any) {
       notify({
@@ -113,7 +123,13 @@ const TransactionModal = ({
 
   return (
     <Modals
-      title={"Add Transaction"}
+      modalTitle={`${
+        actionType === "deposit"
+          ? "Deposit"
+          : actionType === "withdraw"
+          ? "Withdraw"
+          : ""
+      }`}
       onClose={handleClose}
       open={open}
       onOk={handleSubmit(onSubmit)}

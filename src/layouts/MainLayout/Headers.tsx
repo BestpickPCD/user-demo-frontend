@@ -14,12 +14,19 @@ import {
   useTheme,
 } from "@mui/material";
 import Link from "next/link";
-import { AccountCircle as User } from "@mui/icons-material";
+import {
+  AccountCircle as User,
+  CurrencyBitcoinRounded as Currency,
+} from "@mui/icons-material";
 import { useRouter } from "next/router";
 import { useEffect, useMemo, useState } from "react";
 import { FormattedMessage } from "react-intl";
 import TransactionModal from "@/modules/Transactions/TransactionModal";
 import { useModal } from "@/utils/hooks";
+import { useUserInfoQuery } from "@/services/gamesService";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "@/app/store";
+import { isSubmitTransaction as isSubmitTransactionAction } from "@/app/slices/commonSlices";
 const Headers = ({
   onSetLanguage,
   onSetDarkMode,
@@ -30,6 +37,29 @@ const Headers = ({
   const [navLink, setNavLink] = useState("");
   const router = useRouter();
   const [type, setType] = useState("");
+  const { isSubmitTransaction } = useSelector(
+    (state: RootState) => state.common
+  );
+  const dispatch = useDispatch();
+  const user = localStorage.getItem("user") || "";
+  let parseUser;
+  if (user) {
+    parseUser = JSON.parse(user || "");
+  }
+
+  const { data, refetch } = useUserInfoQuery(
+    { id: parseUser?.id || null },
+    { skip: !parseUser?.id }
+  );
+
+  useEffect(() => {
+    if (isSubmitTransaction) {
+      refetch().then(() => {
+        return dispatch(isSubmitTransactionAction(false));
+      });
+    }
+  }, [isSubmitTransaction]);
+
   useEffect(() => {
     setNavLink(router.pathname);
   }, [router]);
@@ -122,7 +152,7 @@ const Headers = ({
     if (userLocal) {
       return (
         <Box
-          width="160px"
+          width="240px"
           position="relative"
           sx={{
             cursor: "pointer",
@@ -134,8 +164,14 @@ const Headers = ({
           }}
         >
           <Box display="flex" alignItems="center" gap="4px">
+            <Box display="flex" alignItems="center" gap="4px">
+              <Currency color="primary" sx={{ color: "#ffba00a6" }} />
+              <Typography width="max-content" whiteSpace="nowrap">
+                {data?.data?.balance}
+              </Typography>
+            </Box>
             <Typography
-              width="120px"
+              maxWidth="120px"
               textOverflow="ellipsis"
               whiteSpace="nowrap"
               overflow="hidden"
@@ -164,7 +200,7 @@ const Headers = ({
         </Box>
       );
     }
-  }, [theme, username]);
+  }, [theme, username, data]);
 
   return (
     <Box

@@ -3,11 +3,13 @@ import { createSlice } from "@reduxjs/toolkit";
 export interface CounterState {
   lang: string;
   theme: "dark" | "light" | "";
+  isSubmitTransaction: boolean;
 }
 
 const initialState: CounterState = {
   lang: "",
   theme: "",
+  isSubmitTransaction: false,
 };
 
 export const commonSlice = createSlice({
@@ -22,10 +24,14 @@ export const commonSlice = createSlice({
       ...state,
       lang: action.payload,
     }),
+    isSubmitTransaction: (state, action) => ({
+      ...state,
+      isSubmitTransaction: action.payload,
+    }),
   },
 });
 
 // Action creators are generated for each case reducer function
-export const { getTheme, getLang } = commonSlice.actions;
+export const { getTheme, getLang, isSubmitTransaction } = commonSlice.actions;
 
 export default commonSlice.reducer;
