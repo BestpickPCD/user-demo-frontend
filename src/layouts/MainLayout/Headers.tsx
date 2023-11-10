@@ -19,7 +19,7 @@ import {
   CurrencyBitcoinRounded as Currency,
 } from "@mui/icons-material";
 import { useRouter } from "next/router";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { FormattedMessage } from "react-intl";
 import TransactionModal from "@/modules/Transactions/TransactionModal";
 import { useModal } from "@/utils/hooks";
@@ -75,7 +75,6 @@ const Headers = ({
     localStorage.setItem("theme", isDarkMode === "dark" ? "light" : "dark");
   };
 
-  const handleRedirectChat = () => {};
   const { hide, show, visible } = useModal();
   const redirectLinkMemo = useMemo(() => {
     const isHaveToken = !!localStorage.getItem("tokens");
@@ -89,6 +88,26 @@ const Headers = ({
     show();
     setType(type);
   };
+
+  const chatUrl = useCallback(() => {
+    const userLocal = localStorage.getItem("user");
+    if (userLocal) {
+      const user = JSON.parse(userLocal);
+      const userString = {
+        _id: user.id,
+        username: user.username,
+        type: "player",
+        userGroup: "",
+        userDomain: "",
+        userCode: "",
+      };
+      window.open(
+        `${process.env.REACT_APP_CHAT_URL}?user=${JSON.stringify(userString)}`,
+        "_blank",
+        "location=yes,height=570,width=520,scrollbars=yes,status=yes"
+      );
+    }
+  }, []);
 
   const navLinkMemo = useMemo(() => {
     const isHaveToken = !!localStorage.getItem("tokens");
@@ -109,17 +128,9 @@ const Headers = ({
           </Link>
         </ListItem>
         <ListItem className="w-full whitespace-nowrap">
-          <Link
-            href={`${
-              process.env.NEXT_PUBLIC_CHAT_URL
-            }?token=${localStorage.getItem(
-              "tokens"
-            )}&user=${localStorage.getItem("user")}`}
-            onClick={handleRedirectChat}
-            target="_blank"
-          >
+          <Box onClick={chatUrl}>
             <FormattedMessage id="label.contacts" />
-          </Link>
+          </Box>
         </ListItem>
         <ListItem className="w-full whitespace-nowrap">
           <Button onClick={() => onOpenModal("deposit")}>Deposit</Button>
