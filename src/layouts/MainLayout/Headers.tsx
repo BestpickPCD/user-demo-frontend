@@ -102,7 +102,9 @@ const Headers = ({
         userCode: "",
       };
       window.open(
-        `${process.env.REACT_APP_CHAT_URL}?user=${JSON.stringify(userString)}`,
+        `${process.env.NEXT_PUBLIC_CHAT_URL}?user=${JSON.stringify(
+          userString
+        )}`,
         "_blank",
         "location=yes,height=570,width=520,scrollbars=yes,status=yes"
       );
