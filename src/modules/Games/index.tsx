@@ -24,12 +24,14 @@ const Item = styled(Paper)(({ theme }) => ({
 
 const Games = () => {
   const { data } = useGetGamesQuery();
+  console.log(data)
   const theme = useTheme();
   const { visible, toggle } = useModal();
   const [gameData, setGameData] = React.useState<any>();
   const onRender = (item: any) => {
     const set = new Set(
-      item.fetchGames.map((fetchGameItem: any) => fetchGameItem.type)
+      
+      // item.fetchGames.map((fetchGameItem: any) => fetchGameItem.type)
     );
     const arr = Array.from(set) as string[];
     return arr.map((gameType, index) => (
@@ -85,7 +87,7 @@ const Games = () => {
                   <Box bgcolor="color.contrastText" padding={1}>
                     <Typography color="color.text" variant="h6" paddingY={1}>
                       {item.name.slice(0, 1).toUpperCase() + item.name.slice(1)}
-                      {item.fetchGames.length}
+                      {/* {item.fetchGames.length} */}
                     </Typography>
                     <Box
                       display="flex"

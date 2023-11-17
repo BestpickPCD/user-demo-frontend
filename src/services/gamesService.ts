@@ -30,6 +30,12 @@ export const GamesService = createApi({
         params,
       }),
     }),
+    getGameList: builder.mutation<any,any>({
+      query: ({vendor}) => ({
+        url: `/game-list?vendor=${vendor}`,
+        method: 'GET'
+      })
+    }),
     checkUser: builder.mutation<any, any>({
       query: (body) => ({
         url: "/user/check-user",
