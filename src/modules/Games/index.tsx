@@ -1,4 +1,4 @@
-import { useGetGamesQuery } from "@/services/gamesService";
+import { useGetGameListMutation, useGetGamesQuery } from "@/services/gamesService";
 import {
   Box,
   Card,
@@ -10,7 +10,7 @@ import {
   useTheme,
 } from "@mui/material";
 import Image from "next/image";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { imgs } from "../../../public";
 import { useModal } from "@/utils/hooks";
 import GamesModal from "./GamesModal";
@@ -24,12 +24,34 @@ const Item = styled(Paper)(({ theme }) => ({
 
 const Games = () => {
   const { data } = useGetGamesQuery();
+  const [getGameList] = useGetGameListMutation();
   const theme = useTheme();
   const { visible, toggle } = useModal();
   const [gameData, setGameData] = React.useState<any>();
+  const [gameList, setGameList] = useState()
+
+  const listGames = async (vendors: string | undefined) => {
+    const data = await getGameList({vendor: vendors}).unwrap();
+    return data
+  }
+
+  useEffect(() => {
+
+    const vendorsParams = data?.data.data.map(datum => datum.name).join(',');
+
+    const fetchData = async () => {
+      // const gamesData = await listGames(vendorsParams);
+      const gamesData = await listGames('Bestpick');
+      console.log(gamesData)
+      setGameList(gamesData)
+    };
+
+    fetchData();
+  },[])
+
   const onRender = (item: any) => {
     const set = new Set(
-      item.fetchGames.map((fetchGameItem: any) => fetchGameItem.type)
+      // item.fetchGames.map((fetchGameItem: any) => fetchGameItem.type)
     );
     const arr = Array.from(set) as string[];
     return arr.map((gameType, index) => (
@@ -85,7 +107,7 @@ const Games = () => {
                   <Box bgcolor="color.contrastText" padding={1}>
                     <Typography color="color.text" variant="h6" paddingY={1}>
                       {item.name.slice(0, 1).toUpperCase() + item.name.slice(1)}
-                      {item.fetchGames.length}
+                      {/* {item.fetchGames.length} */}
                     </Typography>
                     <Box
                       display="flex"
@@ -105,17 +127,13 @@ const Games = () => {
       <GamesModal
         visible={visible}
         toggle={toggle}
-        data={gameData?.fetchGames}
+        data={gameList}
         title={
           <Box display="flex">
             <Typography fontSize={18}>
               {gameData?.name?.slice(0, 1).toUpperCase() +
-                gameData?.name?.slice(1)}
-            </Typography>
-            &nbsp;
-            <Typography fontSize={18}>
-              ({gameData?.fetchGames?.length})
-            </Typography>
+                gameData?.name?.slice(1) }
+            </Typography> 
           </Box>
         }
       />

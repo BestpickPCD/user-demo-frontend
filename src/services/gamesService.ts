@@ -30,6 +30,12 @@ export const GamesService = createApi({
         params,
       }),
     }),
+    getGameList: builder.mutation<any,any>({
+      query: ({vendor}) => ({
+        url: `/game-list?vendors=${vendor}`,
+        method: 'GET'
+      })
+    }),
     checkUser: builder.mutation<any, any>({
       query: (body) => ({
         url: "/user/check-user",
@@ -44,6 +50,13 @@ export const GamesService = createApi({
         body,
       }),
     }),
+    openGame: builder.mutation<any,any>({
+      query: (body) => ({
+        url: "/game/open",
+        method: "POST",
+        body
+      })
+    }),
     userInfo: builder.query<any, { id: number }>({
       query: ({ id }) => ({
         url: `/user/${id}`,
@@ -54,8 +67,10 @@ export const GamesService = createApi({
 
 export const {
   useGetGamesQuery,
+  useGetGameListMutation,
   useGetTransactionQuery,
   useCheckUserMutation,
   useCreateTransactionMutation,
   useUserInfoQuery,
+  useOpenGameMutation
 } = GamesService;
