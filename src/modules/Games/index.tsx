@@ -1,4 +1,7 @@
-import { useGetGameListMutation, useGetGamesQuery } from "@/services/gamesService";
+import {
+  useGetGameListMutation,
+  useGetGamesQuery,
+} from "@/services/gamesService";
 import {
   Box,
   Card,
@@ -28,30 +31,28 @@ const Games = () => {
   const theme = useTheme();
   const { visible, toggle } = useModal();
   const [gameData, setGameData] = React.useState<any>();
-  const [gameList, setGameList] = useState()
+  const [gameList, setGameList] = useState();
 
   const listGames = async (vendors: string | undefined) => {
-    const data = await getGameList({vendor: vendors}).unwrap();
-    return data
-  }
+    const data = await getGameList({ vendor: vendors }).unwrap();
+    return data;
+  };
 
   useEffect(() => {
-
-    const vendorsParams = data?.data.data.map(datum => datum.name).join(',');
+    const vendorsParams = data?.data.data.map((datum) => datum.name).join(",");
 
     const fetchData = async () => {
       // const gamesData = await listGames(vendorsParams);
-      const gamesData = await listGames('Bestpick');
-      setGameList(gamesData)
+      const gamesData = await listGames("Bestpick");
+      setGameList(gamesData);
     };
 
     fetchData();
-  },[])
+  }, []);
 
   const onRender = (item: any) => {
-    const set = new Set(
-      // item.fetchGames.map((fetchGameItem: any) => fetchGameItem.type)
-    );
+    const set = new Set();
+    // item.fetchGames.map((fetchGameItem: any) => fetchGameItem.type)
     const arr = Array.from(set) as string[];
     return arr.map((gameType, index) => (
       <Box
@@ -78,7 +79,11 @@ const Games = () => {
     <>
       <Container sx={{ marginTop: 10 }}>
         <Typography>GAMES</Typography>
+<<<<<<< HEAD
         {/* {data?.data?.data[0].fetchGames.length} games are available from{" "} */}
+=======
+        {data?.data?.data[0]?.fetchGames?.length} games are available from{" "}
+>>>>>>> 51ac4d7047fce2560cb00ae3f85df287a11dd2b9
         {data?.data?.data.length} game companies.
         <Box marginY={3}>
           <Grid
@@ -131,8 +136,8 @@ const Games = () => {
           <Box display="flex">
             <Typography fontSize={18}>
               {gameData?.name?.slice(0, 1).toUpperCase() +
-                gameData?.name?.slice(1) }
-            </Typography> 
+                gameData?.name?.slice(1)}
+            </Typography>
           </Box>
         }
       />
