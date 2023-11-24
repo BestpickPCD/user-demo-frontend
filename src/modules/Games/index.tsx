@@ -79,11 +79,7 @@ const Games = () => {
     <>
       <Container sx={{ marginTop: 10 }}>
         <Typography>GAMES</Typography>
-<<<<<<< HEAD
         {/* {data?.data?.data[0].fetchGames.length} games are available from{" "} */}
-=======
-        {data?.data?.data[0]?.fetchGames?.length} games are available from{" "}
->>>>>>> 51ac4d7047fce2560cb00ae3f85df287a11dd2b9
         {data?.data?.data.length} game companies.
         <Box marginY={3}>
           <Grid
