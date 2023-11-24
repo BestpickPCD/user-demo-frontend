@@ -22,13 +22,11 @@ const style = {
 };
 
 
-const GamesModal = ({ data, visible, title, toggle }: GamesModalProps) => { 
-
+const GamesModal = ({ data, visible, title, toggle }: GamesModalProps) => {
   const [urlOpenGame] = useOpenGameMutation();
 
   const openGame = async (gameId: string) => {
-    const { data } = await urlOpenGame({gameId}).unwrap();
-    console.log(data.url)
+    const { data } = await urlOpenGame({gameId}).unwrap(); 
     setIFrameUrl(data.url)
     setOpen(true)
   }
@@ -47,7 +45,7 @@ const GamesModal = ({ data, visible, title, toggle }: GamesModalProps) => {
         >
           {Array.isArray(data) && 
           data?.map((item: any) => (
-            <Grid key={item.id} item xs={4} sm={4} md={3}>
+            <Grid key={item.game_id} item xs={4} sm={4} md={3}>
               <Card onClick={() => openGame(item.game_id)}>
                 <Box padding={1}>
                   <Image

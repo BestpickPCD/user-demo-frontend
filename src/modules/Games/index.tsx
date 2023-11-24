@@ -42,7 +42,6 @@ const Games = () => {
     const fetchData = async () => {
       // const gamesData = await listGames(vendorsParams);
       const gamesData = await listGames('Bestpick');
-      console.log(gamesData)
       setGameList(gamesData)
     };
 
@@ -79,7 +78,7 @@ const Games = () => {
     <>
       <Container sx={{ marginTop: 10 }}>
         <Typography>GAMES</Typography>
-        {data?.data?.data[0].fetchGames.length} games are available from{" "}
+        {/* {data?.data?.data[0].fetchGames.length} games are available from{" "} */}
         {data?.data?.data.length} game companies.
         <Box marginY={3}>
           <Grid
