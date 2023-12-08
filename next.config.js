@@ -1,13 +1,16 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    domains: [
-      "ap-south-1.linodeobjects.com",
-      "https://user-demo-frontend.vercel.app/",
-      "localhost",
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'media.ttfileserver.com',
+        port: '',
+        pathname: '',
+      },
     ],
   },
-
+  reactStrictMode: false,
   styledComponents: true,
 };
 

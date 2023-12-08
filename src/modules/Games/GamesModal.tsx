@@ -23,6 +23,7 @@ const style = {
 
 
 const GamesModal = ({ data, visible, title, toggle }: GamesModalProps) => {
+
   const [urlOpenGame] = useOpenGameMutation();
 
   const openGame = async (gameId: string) => {
@@ -44,18 +45,20 @@ const GamesModal = ({ data, visible, title, toggle }: GamesModalProps) => {
           columns={{ xs: 8, sm: 8, md: 12 }}
         >
           {Array.isArray(data) && 
-          data?.map((item: any) => (
-            <Grid key={item.game_id} item xs={4} sm={4} md={3}>
-              <Card onClick={() => openGame(item.game_id)}>
+          data?.map((item: any, index: number) => (
+            <Grid key={index} item xs={4} sm={4} md={3}>
+              <Card 
+                // onClick={() => openGame(item.id)}
+              >
                 <Box padding={1}>
-                  <Image
+                  {/* <Image
                     width={200}
                     height={200}
-                    src={`${item.img_path}`}
-                    alt={item.game_name}
-                  />
+                    src={`${item.img}`}
+                    alt={item.name}
+                  /> */}
                 </Box>
-                <Typography padding={1}>{item.title}</Typography>
+                <Typography padding={1}>{item.name}</Typography>
               </Card>
             </Grid>
           ))}

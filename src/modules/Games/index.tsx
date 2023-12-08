@@ -33,26 +33,31 @@ const Games = () => {
   const [gameData, setGameData] = React.useState<any>();
   const [gameList, setGameList] = useState();
 
-  const listGames = async (vendors: string | undefined) => {
-    const data = await getGameList({ vendor: vendors }).unwrap();
+  const listGames = async (vendors: string | undefined) => { 
+    const data = await getGameList({ vendors }).unwrap();
+    console.log(data)
     return data;
   };
 
   useEffect(() => {
-    const vendorsParams = data?.data.data.map((datum) => datum.name).join(",");
 
-    const fetchData = async () => {
-      // const gamesData = await listGames(vendorsParams);
-      const gamesData = await listGames("Bestpick");
-      setGameList(gamesData);
-    };
+    if(data?.data) {
+      const vendorsParams = data?.data.data.map((datum) => datum.name).join(",");
+      const fetchData = async () => {
+        const gamesData = await getGameList({ vendors: vendorsParams }).unwrap();
+        // const gamesData = await listGames("Bestpick");
+        setGameList(gamesData);
+      };
+  
+      fetchData();
+    }
 
-    fetchData();
-  }, []);
+  }, [data?.data]);
 
   const onRender = (item: any) => {
     const set = new Set();
     // item.fetchGames.map((fetchGameItem: any) => fetchGameItem.type)
+    console.log(item)
     const arr = Array.from(set) as string[];
     return arr.map((gameType, index) => (
       <Box
@@ -105,7 +110,7 @@ const Games = () => {
                     <Image src={imgs.vendorEvolution} alt={item.name} />
                   </Box>
                   <Box bgcolor="color.contrastText" padding={1}>
-                    <Typography color="color.text" variant="h6" paddingY={1}>
+                    <Typography color="color.text" variant="h6" paddingY={1}> 
                       {item.name.slice(0, 1).toUpperCase() + item.name.slice(1)}
                       {/* {item.fetchGames.length} */}
                     </Typography>
@@ -123,7 +128,7 @@ const Games = () => {
             ))}
           </Grid>
         </Box>
-      </Container>
+      </Container> 
       <GamesModal
         visible={visible}
         toggle={toggle}
