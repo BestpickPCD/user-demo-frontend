@@ -34,57 +34,20 @@ const Games = () => {
   const [gameList, setGameList] = useState();
 
   const listGames = async (vendors: string | undefined) => { 
-    const data = await getGameList({ vendors }).unwrap();
-    console.log(data)
+    const data = await getGameList({ vendors }).unwrap(); 
     return data;
   };
 
-  useEffect(() => {
-
-    if(data?.data) {
-      const vendorsParams = data?.data.data.map((datum) => datum.name).join(",");
-      const fetchData = async () => {
-        const gamesData = await getGameList({ vendors: vendorsParams }).unwrap();
-        // const gamesData = await listGames("Bestpick");
-        setGameList(gamesData);
-      };
-  
-      fetchData();
-    }
-
-  }, [data?.data]);
-
-  const onRender = (item: any) => {
-    const set = new Set();
-    // item.fetchGames.map((fetchGameItem: any) => fetchGameItem.type)
-    console.log(item)
-    const arr = Array.from(set) as string[];
-    return arr.map((gameType, index) => (
-      <Box
-        key={index}
-        width="max-content"
-        paddingY={0.5}
-        paddingX={1}
-        borderRadius={1}
-        bgcolor="color.text"
-      >
-        <Typography color="color.contrastText" fontSize={14}>
-          {gameType.slice(0, 1).toUpperCase() + gameType.slice(1)}
-        </Typography>
-      </Box>
-    ));
-  };
-
-  const onClickGame = (item: any) => {
-    setGameData(item);
+  const onClickGame = async (item: any) => {
+    const list = await listGames(item.name); 
+    setGameList(list);
     toggle();
   };
 
   return (
     <>
       <Container sx={{ marginTop: 10 }}>
-        <Typography>GAMES</Typography>
-        {/* {data?.data?.data[0].fetchGames.length} games are available from{" "} */}
+        <Typography>GAMES</Typography> 
         {data?.data?.data.length} game companies.
         <Box marginY={3}>
           <Grid
@@ -113,15 +76,7 @@ const Games = () => {
                     <Typography color="color.text" variant="h6" paddingY={1}> 
                       {item.name.slice(0, 1).toUpperCase() + item.name.slice(1)}
                       {/* {item.fetchGames.length} */}
-                    </Typography>
-                    <Box
-                      display="flex"
-                      gap={1}
-                      alignItems="center"
-                      flexWrap="wrap"
-                    >
-                      {onRender(item)}
-                    </Box>
+                    </Typography> 
                   </Box>
                 </Item>
               </Grid>
