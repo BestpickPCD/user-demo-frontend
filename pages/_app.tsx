@@ -3,20 +3,20 @@ import createEmotionCache from "@/createEmotionCache";
 import { default as enLanguage } from "@/locales/en.json";
 import { default as koLanguage } from "@/locales/ko.json";
 import "@/styles/global.css";
+import "@/styles/index.scss";
 import { darkModeTheme, lightModeTheme } from "@/theme";
 import { CacheProvider, EmotionCache, ThemeProvider } from "@emotion/react";
 import CssBaseline from "@mui/material/CssBaseline";
+import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AppProps } from "next/app";
 import Head from "next/head";
+import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { IntlProvider } from "react-intl";
 import { Provider } from "react-redux";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { useRouter } from "next/router";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
-
 const clientSideEmotionCache = createEmotionCache();
 export interface MyAppProps extends AppProps {
   emotionCache?: EmotionCache;
