@@ -55,7 +55,6 @@ const GamesModal = ({ data, visible, title, toggle, directUrl }: GamesModalProps
   const user = localStorage.getItem("user"); 
   const [urlOpenGame] = useOpenGameMutation(); 
   const openGame = async (details:any) => {
-    console.log(details)
     const { id: gameId, vendor } = details;
     const { username } = JSON.parse(user as string);
     const { data } = await urlOpenGame({ gameId, vendor, directUrl, username }).unwrap(); 
