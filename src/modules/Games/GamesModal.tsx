@@ -17,6 +17,7 @@ import NextImage from "next/image";
 import React, { ReactNode, useEffect, useRef, useState } from "react";
 interface GamesModalProps {
   data: any;
+  directUrl: boolean;
   visible: boolean;
   title: ReactNode;
   toggle: () => void;
@@ -49,12 +50,16 @@ const getColor = (index: number) => {
   return "rgba(94, 29, 29, 0.1)";
 };
 
-const GamesModal = ({ data, visible, title, toggle }: GamesModalProps) => {
-  const [urlOpenGame] = useOpenGameMutation();
+const GamesModal = ({ data, visible, title, toggle, directUrl }: GamesModalProps) => {
 
-  const openGame = async (gameId: string) => {
-    const { data } = await urlOpenGame({ gameId }).unwrap();
-    setIFrameUrl(data.url);
+  const user = localStorage.getItem("user"); 
+  const [urlOpenGame] = useOpenGameMutation(); 
+  const openGame = async (details:any) => {
+    console.log(details)
+    const { id: gameId, vendor } = details;
+    const { username } = JSON.parse(user as string);
+    const { data } = await urlOpenGame({ gameId, vendor, directUrl, username }).unwrap(); 
+    setIFrameUrl(data.link);
     setOpen(true);
   };
 
@@ -77,7 +82,7 @@ const GamesModal = ({ data, visible, title, toggle }: GamesModalProps) => {
               position="relative"
               key={`${row.url}-${index}`}
             >
-              <Box height="100%" width="100%" onClick={() => openGame(row.id)}>
+              <Box height="100%" width="100%" onClick={() => openGame(row)}>
                 <div className="game-detail">
                   <div className="card">
                     <NextImage

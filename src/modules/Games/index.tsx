@@ -30,8 +30,8 @@ const Games = () => {
   const { data } = useGetGamesQuery();
   const [getGameList] = useGetGameListMutation();
   const { visible, toggle } = useModal();
-  const [gameList, setGameList] = useState<any[]>([]);
-
+  const [directUrl, setDirectUrl] = useState(false)
+  const [gameList, setGameList] = useState<any[]>([]); 
   const listGames = async (vendors: string | undefined) => {
     const data = await getGameList({ vendors }).unwrap();
     return data;
@@ -39,6 +39,7 @@ const Games = () => {
 
   const onClickGame = async (item: any) => {
     const list = await listGames(item.name);
+    setDirectUrl(item.directUrl)
     setGameList(list);
     toggle();
   };
@@ -71,8 +72,7 @@ const Games = () => {
                         className="cover-image"
                       />
                     </div>
-                    <Typography className="character">{item.name}</Typography>
-
+                    <Typography className="character">{item.name}</Typography> 
                     <Typography className="title">{item.name}</Typography>
                     <Box>
                       <Box
@@ -91,7 +91,8 @@ const Games = () => {
         </Box>
       </Container>
       {gameList?.length && (
-        <GamesModal
+        <GamesModal 
+          directUrl={directUrl}
           visible={visible}
           toggle={toggle}
           data={gameList}
