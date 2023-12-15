@@ -1,7 +1,7 @@
 import React from "react";
 import Headers from "@/layouts/MainLayout/Headers";
 import Footer from "@/layouts/MainLayout/Footer";
-import Chat from "@/components/Chat";
+// import Chat from "@/components/Chat";
 
 interface MainLayoutProps {
   children: React.ReactNode;
