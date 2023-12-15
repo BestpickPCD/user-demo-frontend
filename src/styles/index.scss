@@ -1,0 +1,385 @@
+@use "sass:color";
+
+.infinity-select {
+  .MuiPaper-root {
+    &.MuiMenu-paper {
+      padding: 0 12px 0 0;
+    }
+    .MuiList-root.MuiList-padding {
+      padding: 0 12px 12px;
+    }
+    .MuiListSubheader-root {
+      padding-top: 14px;
+      margin-top: -1px;
+      background-color: #fff;
+      .MuiInputBase-root.MuiOutlinedInput-root {
+        background-color: #fff;
+      }
+    }
+  }
+}
+html,
+body {
+  overflow-x: hidden;
+}
+:root {
+  --card-height: 300px;
+  --card-width: 100%;
+}
+
+.card {
+  width: var(--card-width);
+  height: var(--card-height);
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  perspective: 2500px;
+}
+
+.cover-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.wrapper {
+  transition: all 0.5s;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.card-content {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  z-index: 2;
+}
+
+.card:hover .wrapper {
+  transform: perspective(900px) translateY(-5%) rotateX(25deg) translateZ(0);
+  box-shadow: 2px 35px 32px -8px rgba(0, 0, 0, 0.75);
+  -webkit-box-shadow: 2px 35px 32px -8px rgba(0, 0, 0, 0.75);
+  -moz-box-shadow: 2px 35px 32px -8px rgba(0, 0, 0, 0.75);
+}
+
+.wrapper::before,
+.wrapper::after {
+  content: "";
+  opacity: 0;
+  width: 100%;
+  height: 80px;
+  transition: all 0.5s;
+  position: absolute;
+  left: 0;
+}
+.wrapper::before {
+  top: 0;
+  height: 100%;
+  background-image: linear-gradient(
+    to top,
+    transparent 46%,
+    rgba(12, 13, 19, 0.5) 68%,
+    rgba(12, 13, 19) 97%
+  );
+}
+.wrapper::after {
+  bottom: 0;
+  opacity: 1;
+  background-image: linear-gradient(
+    to bottom,
+    transparent 46%,
+    rgba(12, 13, 19, 0.5) 68%,
+    rgba(12, 13, 19) 97%
+  );
+}
+
+.card:hover .wrapper::before,
+.wrapper::after {
+  opacity: 1;
+}
+
+.card:hover .wrapper::after {
+  height: 120px;
+}
+.title {
+  width: 100%;
+  transition: all 0.5s;
+  text-align: center;
+  padding-bottom: 40px;
+  color: rgb(255, 255, 255);
+  font-weight: 600;
+  font-size: 18px !important;
+  text-transform: uppercase;
+}
+.card:hover .title {
+  display: none;
+}
+
+.character {
+  height: 70%;
+  opacity: 0;
+  font-size: 20px !important;
+  font-weight: 600;
+  position: absolute;
+  margin-top: 20px;
+  font-family: "Ubuntu", sans-serif;
+  font-weight: 600;
+  color: #fff;
+  text-align: center;
+  letter-spacing: 5px;
+  text-shadow: 3px 3px 20px #ff99cc, -2px 1px 30px #ff99cc;
+  text-transform: uppercase;
+}
+
+.switch {
+  width: 120%;
+  height: 80%;
+  opacity: 1;
+  transition: all 0.5s;
+  position: absolute;
+  left: 8px;
+  top: 20px;
+}
+
+.card:hover .character {
+  opacity: 1;
+}
+.card:hover .switch {
+  opacity: 1;
+  left: 0px;
+  transform: translate3d(8%, 2%, 100px);
+}
+
+.card:hover .button-detail {
+  display: block !important;
+  transform: translate3d(0%, -70%, 100px);
+}
+
+.card:hover .container {
+  transition: opacity 0.3s ease-in;
+  opacity: 1;
+}
+
+.detail {
+  position: absolute;
+  top: 0;
+}
+
+@keyframes zoom-in {
+  from {
+    transform: scale(1) translate(-0, -100px);
+    color: red;
+  }
+  to {
+    transform: scale(1.5) translate(-0, -100px);
+    color: red;
+  }
+}
+$color-primary-white: rgb(61, 61, 157);
+
+.game-detail {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 22%;
+  box-shadow: rgba(0, 0, 0, 0.25) 0px 14px 28px,
+    rgba(0, 0, 0, 0.22) 0px 10px 10px;
+  transform: all 0.5s ease;
+  .card {
+    width: 100% !important;
+    height: 100% !important;
+
+    position: relative;
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      max-width: 100%;
+      max-height: 100%;
+      opacity: 1;
+      transition: opacity 0.2s ease-out;
+    }
+
+    .game-title {
+      position: absolute;
+      inset: auto auto 16px 16px;
+      margin: 0;
+      transition: inset 0.3s 0.3s ease-out;
+      text-transform: uppercase;
+      font-weight: 600;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      overflow: hidden;
+      color: #ffffff;
+      text-shadow: 1px 1px 2px red, 0 0 1em blue, 0 0 0.2em blue;
+      font-weight: 600;
+      font-size: 18px;
+      width: 80%;
+      padding: 2px 4px;
+    }
+
+    p,
+    a {
+      position: absolute;
+      opacity: 0;
+      max-width: 80%;
+      transition: opacity 0.3s ease-out;
+      margin: 0;
+      padding: 16px;
+    }
+
+    p {
+      width: 100%;
+      max-width: 100%;
+      inset: auto auto 00px 00px;
+    }
+
+    &:hover .game-title {
+      inset: auto auto 40% 12px;
+      transition: inset 0.3s ease-out;
+      overflow-wrap: break-word;
+      word-wrap: break-word;
+      hyphens: auto;
+      white-space: wrap;
+    }
+
+    &:hover p,
+    &:hover a {
+      opacity: 1;
+      transition: opacity 0.5s 0.1s ease-in;
+    }
+
+    &:hover img {
+      transition: opacity 0.3s ease-in;
+      opacity: 1;
+    }
+  }
+
+  .material-symbols-outlined {
+    vertical-align: middle;
+  }
+
+  &:hover .override-circle {
+    transform: scale(10);
+  }
+
+  .override-circle {
+    position: absolute;
+    overflow: hidden;
+    top: -75px;
+    right: -75px;
+    width: 128px;
+    height: 128px;
+    transition: transform 0.5s ease-in;
+    border-radius: 22%;
+    .circle {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+    }
+  }
+}
+
+$hue: 277deg;
+$hue-adjust: 135deg;
+
+$hue-contrast: color.hue(color.adjust(hsl($hue, 100%, 50%), $hue: $hue-adjust));
+
+:root {
+  --page-background: #{$hue}, 55%, 12%;
+}
+
+.button-detail {
+  --text-base: #{$hue}, 55%, 40%;
+  --text-hover: #{$hue + 30}, 72%, 86%;
+
+  --shadow-start: #{$hue-contrast}, 100%, 72%;
+  --shadow-end: #{$hue + 5}, 90%, 50%;
+
+  --shadow-inner: #{$hue}, 90%, 62%;
+
+  all: unset;
+
+  color: hsla(var(--text-base), 1);
+  font: 700 1.125rem/1.2 Raleway, sans-serif;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-align: center;
+
+  padding: 6px 12px;
+  max-width: 100%;
+  display: block;
+
+  // Button styling
+  background: inherit;
+  background-clip: padding-box;
+  border: 5px solid hsla(var(--text-base), 1);
+  border-radius: 2em;
+  cursor: pointer;
+
+  position: relative;
+  transition: 0.25s ease-out;
+  background: hsla(var(--page-background), 1);
+
+  &::before,
+  &::after {
+    content: "";
+    border-radius: inherit;
+    transition: inherit;
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  &::before {
+    inset: -0.2em;
+    z-index: -1;
+
+    background: linear-gradient(
+      hsla(var(--shadow-start), 1),
+      hsla(var(--shadow-end), 1)
+    );
+    filter: blur(1.2em) saturate(1.2);
+
+    // Animation
+    transform-origin: bottom;
+    transform: scaleY(0.5);
+    opacity: 0;
+  }
+
+  &::after {
+    box-shadow: inset 0 0 0 1px #fff, 0 0 0 4px hsla(0deg, 0%, 100%, 0.7),
+      1px 1px 0 4px #fff;
+    mix-blend-mode: overlay;
+    opacity: 0;
+  }
+
+  &:hover,
+  &:focus {
+    color: hsla(var(--text-hover), 1);
+    border-color: transparent;
+    box-shadow: inset 0 1.4em 0 hsla(var(--shadow-inner), 0.1),
+      inset 0 0 1.4em hsla(var(--shadow-inner), 0.32),
+      0 1px 1px hsla(var(--shadow-inner), 0.32); // bottom line
+    &::before,
+    &::after {
+      transform: none;
+      opacity: 1;
+    }
+  }
+}
+
+.container {
+  position: absolute;
+  z-index: 1;
+  bottom: 0;
+  left: 50%;
+  width: 80%;
+  transform: translate(-50%, -50%);
+  opacity: 0;
+}

@@ -3,10 +3,8 @@ const nextConfig = {
   images: {
     remotePatterns: [
       {
-        protocol: 'https',
-        hostname: 'media.ttfileserver.com',
-        port: '',
-        pathname: '',
+        protocol: "https",
+        hostname: "**",
       },
     ],
   },
