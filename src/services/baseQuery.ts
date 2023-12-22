@@ -105,7 +105,6 @@ export const baseQueryWithReAuthChat: BaseQueryFn<
           JSON.stringify({ token: refreshResult.data })
         );
         result = await baseQuery(args, api, extraOptions);
-        console.log(result);
       } else {
         window.location.href = "/";
         localStorage.removeItem("tokens");
