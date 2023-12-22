@@ -39,7 +39,7 @@ const Games = () => {
 
   const onClickGame = async (item: any) => {
     const list = await listGames(item.name); 
-    // setDirectUrl(item.directUrl)
+    setDirectUrl(item.directUrl)
     setGameList(list);
     toggle();
   };
