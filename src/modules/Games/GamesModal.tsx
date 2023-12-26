@@ -58,12 +58,15 @@ const GamesModal = ({ data, visible, title, toggle, directUrl }: GamesModalProps
     const { id: gameId, vendor } = details;
     const { username } = JSON.parse(user as string);
     const { data } = await urlOpenGame({ gameId, vendor, directUrl, username }).unwrap(); 
-    setIFrameUrl(data.link);
+    setIFrameData({
+      html: data.html,
+      url: data.link
+    });
     setOpen(true);
   };
 
-  const [iframeUrl, setIFrameUrl] = React.useState("");
-  const [open, setOpen] = React.useState(false);
+  const [iframeData, setIFrameData] = useState({html:'', url:''});
+  const [open, setOpen] = useState(false);
 
   const handleClose = () => setOpen(false);
 
@@ -85,7 +88,7 @@ const GamesModal = ({ data, visible, title, toggle, directUrl }: GamesModalProps
                 <div className="game-detail">
                   <div className="card">
                     <NextImage
-                      src={row.img}
+                      src={row.img ?? `http://167.99.68.34:8000/logos/vendors/default.png`}
                       alt={row.name}
                       loading="lazy"
                       fill={true}
@@ -135,12 +138,19 @@ const GamesModal = ({ data, visible, title, toggle, directUrl }: GamesModalProps
             aria-describedby="modal-modal-description"
           >
             <Container sx={style}>
-              <iframe
-                src={iframeUrl}
-                title="Modal iframe"
+            { iframeData.html ? (
+              <iframe 
+                srcDoc={iframeData.html ?? ''}
                 width={"100%"}
                 height={600}
               />
+            ) : (
+              <iframe 
+                src={iframeData.url ?? ''}
+                width={"100%"}
+                height={600}
+              />
+            ) }
             </Container>
           </Modal>
         </Grid>
