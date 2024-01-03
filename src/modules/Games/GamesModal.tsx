@@ -1,11 +1,6 @@
 import Modals from "@/components/Modals";
 import { useOpenGameMutation } from "@/services/gamesService";
-import {
-  Box,
-  CircularProgress,
-  Grid,
-  Typography,
-} from "@mui/material";
+import { Box, CircularProgress, Grid, Typography } from "@mui/material";
 import NextImage from "next/image";
 import React, { ReactNode } from "react";
 interface GamesModalProps {
@@ -43,21 +38,30 @@ const getColor = (index: number) => {
   return "rgba(94, 29, 29, 0.1)";
 };
 
-const GamesModal = ({ data, visible, title, toggle, directUrl }: GamesModalProps) => {
+const GamesModal = ({
+  data,
+  visible,
+  title,
+  toggle,
+  directUrl,
+}: GamesModalProps) => {
+  const user = localStorage.getItem("user");
+  const [urlOpenGame] = useOpenGameMutation();
 
-  const user = localStorage.getItem("user"); 
-  const [urlOpenGame] = useOpenGameMutation(); 
-
-  const openGame = async (details:any) => {
-
+  const openGame = async (details: any) => {
     const { id: gameId, vendor } = details;
-    const { username } = JSON.parse(user as string);
-    const { data } = await urlOpenGame({ gameId, vendor, directUrl, username }).unwrap();
-    const newTab = window.open(data.link, '_blank');
+    const { username, id } = JSON.parse(user as string);
+    const { data } = await urlOpenGame({
+      gameId,
+      vendor,
+      directUrl,
+      username: id,
+    }).unwrap();
+    const newTab = window.open(data.link, "_blank");
     if (data.html && newTab) {
       newTab.document.write(data.html);
     } else {
-      console.error('Failed to open a new tab.');
+      console.error("Failed to open a new tab.");
     }
   };
 
@@ -79,7 +83,10 @@ const GamesModal = ({ data, visible, title, toggle, directUrl }: GamesModalProps
                 <div className="game-detail">
                   <div className="card">
                     <NextImage
-                      src={row.img ?? `http://167.99.68.34:8000/logos/vendors/default.png`}
+                      src={
+                        row.img ??
+                        `http://167.99.68.34:8000/logos/vendors/default.png`
+                      }
                       alt={row.name}
                       loading="lazy"
                       fill={true}
