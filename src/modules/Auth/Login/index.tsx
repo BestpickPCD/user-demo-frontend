@@ -14,6 +14,7 @@ import {
 import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { FormattedMessage } from "react-intl";
 import * as yup from "yup";
@@ -34,9 +35,16 @@ const schema = yup.object().shape({
     .required("Password is required"),
 });
 export default function Home() {
+  const router = useRouter();
+  useEffect(() => {
+    const tokens = localStorage.getItem('tokens');
+    if (tokens) {
+      router.push('/games');
+    }
+  }, []);
+
   const [onLogin, { isLoading }] = useLoginMutation();
   const { message, notify } = useToast();
-  const router = useRouter();
   const {
     register,
     handleSubmit,
