@@ -90,7 +90,7 @@ const Games = () => {
           </Grid>
         </Box>
       </Container>
-      {gameList?.length && (
+      {/* {gameList?.length && (
         <GamesModal 
           directUrl={directUrl}
           visible={visible}
@@ -98,7 +98,7 @@ const Games = () => {
           data={gameList}
           title={<Box display="flex"></Box>}
         />
-      )}
+      )} */}
     </>
   );
 };
