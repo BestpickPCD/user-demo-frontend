@@ -156,7 +156,7 @@ body {
 }
 
 .card:hover .button-detail {
-  display: block !important;
+  // display: block !important;
   transform: translate3d(0%, -70%, 100px);
 }
 
@@ -239,6 +239,9 @@ $color-primary-white: rgb(61, 61, 157);
       inset: auto auto 00px 00px;
     }
 
+    &:hover .container1 {
+      opacity: 1 !important;
+    }
     &:hover .game-title {
       inset: auto auto 40% 12px;
       transition: inset 0.3s ease-out;
@@ -374,12 +377,14 @@ $hue-contrast: color.hue(color.adjust(hsl($hue, 100%, 50%), $hue: $hue-adjust));
   }
 }
 
-.container {
+.container1 {
   position: absolute;
-  z-index: 1;
-  bottom: 0;
-  left: 50%;
-  width: 80%;
-  transform: translate(-50%, -50%);
+  bottom: 10%;
+  width: 100%;
   opacity: 0;
+}
+
+.card:hover .container1 {
+  opacity: 1 !important;
+  width: 80%;
 }
