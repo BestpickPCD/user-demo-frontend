@@ -66,7 +66,13 @@ const GamesModal = ({
   };
 
   return (
-    <Modals open={visible} onClose={toggle} maxWidth="lg" modalTitle={title}>
+    <Modals
+      open={visible}
+      onClose={toggle}
+      maxWidth="lg"
+      fullWidth
+      modalTitle={title}
+    >
       <Box padding={2}>
         <Grid container columns={{ xs: 8, sm: 12, md: 16, lg: 20 }} spacing={2}>
           {data?.map((row: any, index: number) => (
@@ -91,6 +97,7 @@ const GamesModal = ({
                       loading="lazy"
                       fill={true}
                       sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                      style={{ borderRadius: "22%" }}
                     />
                     <Box
                       width="100%"

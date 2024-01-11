@@ -27,6 +27,9 @@ import { useUserInfoQuery } from "@/services/gamesService";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/app/store";
 import { isSubmitTransaction as isSubmitTransactionAction } from "@/app/slices/commonSlices";
+import io from "socket.io-client";
+
+const url = process.env.NEXT_PUBLIC_API_URL;
 const Headers = ({
   onSetLanguage,
   onSetDarkMode,
@@ -59,6 +62,19 @@ const Headers = ({
       });
     }
   }, [isSubmitTransaction]);
+
+  useEffect(() => {
+    const localUser = localStorage.getItem("user");
+    if (localUser) {
+      const user = JSON.parse(localUser);
+      if (url) {
+        const socket = io(url);
+        socket.on(`${user.id}-played`, (data) => {
+          refetch();
+        });
+      }
+    }
+  }, []);
 
   useEffect(() => {
     setNavLink(router.pathname);

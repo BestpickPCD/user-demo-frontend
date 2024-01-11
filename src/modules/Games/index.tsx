@@ -30,19 +30,21 @@ const Games = () => {
   const { data } = useGetGamesQuery();
   const [getGameList] = useGetGameListMutation();
   const { visible, toggle } = useModal();
-  const [directUrl, setDirectUrl] = useState(false)
-  const [gameList, setGameList] = useState<any[]>([]); 
+  const [directUrl, setDirectUrl] = useState(false);
+  const [gameList, setGameList] = useState<any[]>([]);
+
   const listGames = async (vendors: string | undefined) => {
     const data = await getGameList({ vendors }).unwrap();
     return data;
   };
 
   const onClickGame = async (item: any) => {
-    const list = await listGames(item.name); 
-    setDirectUrl(item.directUrl)
+    const list = await listGames(item.name);
+    setDirectUrl(item.directUrl);
     setGameList(list);
     toggle();
   };
+  console.log(gameList);
 
   return (
     <>
@@ -63,7 +65,7 @@ const Games = () => {
                 padding={1}
                 key={`${item.img}-${index}`}
               >
-                <Box>
+                <Box position="relative">
                   <div className="card">
                     <div className="wrapper">
                       <Image
@@ -72,16 +74,14 @@ const Games = () => {
                         className="cover-image"
                       />
                     </div>
-                    <Typography className="character">{item.name}</Typography> 
+                    <Typography className="character">{item.name}</Typography>
                     <Typography className="title">{item.name}</Typography>
-                    <Box>
-                      <Box
-                        paddingBottom="10px"
-                        className="container"
-                        onClick={() => onClickGame(item)}
-                      >
-                        <p className="button-detail">View Detail</p>
-                      </Box>
+                    <Box
+                      paddingBottom="10px"
+                      className="container1"
+                      onClick={() => onClickGame(item)}
+                    >
+                      <p className="button-detail">Play</p>
                     </Box>
                   </div>
                 </Box>
@@ -90,15 +90,15 @@ const Games = () => {
           </Grid>
         </Box>
       </Container>
-      {/* {gameList?.length && (
-        <GamesModal 
+      {gameList?.length && (
+        <GamesModal
           directUrl={directUrl}
           visible={visible}
           toggle={toggle}
           data={gameList}
-          title={<Box display="flex"></Box>}
+          title={<Box display="flex">{gameList[0]?.provider}</Box>}
         />
-      )} */}
+      )}
     </>
   );
 };
