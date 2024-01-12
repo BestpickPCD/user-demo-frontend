@@ -30,6 +30,20 @@ export const GamesService = createApi({
         params,
       }),
     }),
+    getBettingList: builder.query<
+      ResponseType<{
+        data: any[];
+        page: number;
+        size: number;
+        totalItems: number;
+      }>,
+      any
+    >({
+      query: (params) => ({
+        url: "/betting-list",
+        params,
+      }),
+    }),
     getGameList: builder.mutation<any,any>({
       query: (params) => ({
         url: `/game-list`,
@@ -73,5 +87,6 @@ export const {
   useCheckUserMutation,
   useCreateTransactionMutation,
   useUserInfoQuery,
-  useOpenGameMutation
+  useOpenGameMutation,
+  useGetBettingListQuery
 } = GamesService;

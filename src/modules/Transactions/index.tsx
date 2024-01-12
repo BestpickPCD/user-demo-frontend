@@ -1,6 +1,6 @@
 import TableComponent from "@/components/Table";
 import { Transactions } from "@/models";
-import { useGetTransactionQuery } from "@/services/gamesService";
+import { useGetBettingListQuery } from "@/services/gamesService";
 import { formatToISOString, onSortTable } from "@/utils";
 import { useEffect, useState } from "react";
 import TransactionModal from "./TransactionModal";
@@ -52,7 +52,7 @@ const TransactionManagement = (): JSX.Element => {
     data: transactionData,
     isFetching,
     refetch,
-  } = useGetTransactionQuery(
+  } = useGetBettingListQuery(
     {
       id: 1,
       page: pagination.page,

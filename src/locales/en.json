@@ -25,6 +25,8 @@
   "label.sender.name": "Sender name",
   "label.receiver.name": "Receiver name",
   "label.amount": "Amount",
+  "label.total.amount": "Total Amount",
+  "label.bet.amount": "Bet Amount",
   "label.status": "Status",
   "label.type": "Type",
   "label.code": "Code",
@@ -49,5 +51,7 @@
   "label.title": "Title",
   "label.games": "Games",
   "label.history": "Betting History",
+  "label.transactions": "Transactions",
+  "label.details": "Details",
   "label.contacts": "Contacts"
 }

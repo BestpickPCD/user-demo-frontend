@@ -25,6 +25,8 @@
   "label.sender.name": "송신자 이름",
   "label.receiver.name": "수신자 이름",
   "label.amount": "금액",
+  "label.total.amount": "Total Amount",
+  "label.bet.amount": "Bet Amount",
   "label.status": "상태",
   "label.type": "유형",
   "label.code": "코드",
@@ -49,5 +51,7 @@
   "label.title": "제목",
   "label.games": "게임",
   "label.history": "베팅 기록",
+  "label.transactions": "Transactions",
+  "label.details": "Details",
   "label.contacts": "연락처"
 }
