@@ -1,18 +1,31 @@
 import Label from "@/components/MUIComponents/Label";
 import { TableBody, TableHeader } from "@/components/Table/tableType";
-import { Transactions } from "@/models";
 import { transactionTypes } from "@/models/variables";
 import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
+  Box,
+  Chip,
   FormControl,
   InputLabel,
   MenuItem,
   Select,
+  Stack,
+  Table,
+  TableBody as TBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
   Typography,
 } from "@mui/material";
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import moment from "moment";
-import { ReactNode } from "react";
+import React, { ReactNode } from "react";
 import { FormattedMessage } from "react-intl";
+import moment from "moment";
+import Paper from '@mui/material/Paper';
 interface TransactionTableProps {
   tableHeader: TableHeader[];
   tableBody: (item: any) => TableBody[];
@@ -74,18 +87,45 @@ const getStatusLabel = (status: string): JSX.Element => {
   return <Label>{status}</Label>;
 };
 
-const TransactionTable = (): TransactionTableProps => {
-  const tableBody = (item: Transactions): TableBody[] => [
+interface BettingList {
+  betAmount: number;
+  totalAmount: number;
+}
+
+const TransactionTable = (): TransactionTableProps => { 
+
+  const tableBody = (item: any /* change to bettinglist when done */): TableBody[] => [
+    {
+      align: "left",
+      children: (
+        <>
+          <Box>
+            <Stack
+              direction={{ xs: 'column', sm: 'row' }}
+              spacing={{ xs: 1 }}
+            >
+              <Typography variant="body1" color="text.primary" >
+                {item.details.gameName}
+              </Typography>
+            </Stack>
+            <Stack
+              direction={{ xs: 'column', sm: 'row' }}
+              spacing={{ xs: 1 }}
+            >
+            {item.details.gameType.map((type: string) => 
+              <Chip label={type} variant="outlined" key={type} />
+            )}
+            </Stack>
+          </Box>
+        </>
+      ),
+    },
     {
       align: "right",
       children: (
         <>
           <Typography variant="body1" color="text.primary" noWrap>
-            {item.type === "bet" ||
-            item.type === "win" ||
-            item.type === "cancel"
-              ? item.amount
-              : Number(item.amount) * -1}
+            {item.betAmount >= 0 ? item.betAmount : Number(item.betAmount) * -1}
           </Typography>
         </>
       ),
@@ -95,7 +135,7 @@ const TransactionTable = (): TransactionTableProps => {
       children: (
         <>
           <Typography variant="body1" color="text.primary" noWrap>
-            {`${item.type.slice(0, 1).toUpperCase()}${item.type.slice(1)}`}
+            { item.totalAmount }
           </Typography>
         </>
       ),
@@ -104,20 +144,37 @@ const TransactionTable = (): TransactionTableProps => {
       align: "right",
       children: (
         <>
-          <Typography variant="body1" color="text.primary" noWrap>
-            {getStatusLabel(item.status)}
-          </Typography>
-        </>
-      ),
-    },
-    {
-      align: "right",
-      children: (
-        <>
-          <Typography variant="body1" color="text.primary" noWrap>
-            {item?.updatedAt &&
-              moment(item?.updatedAt).format("dd/MM/yyyy HH:mm")}
-          </Typography>
+        <Accordion>
+          <AccordionSummary
+            expandIcon={<ExpandMoreIcon />}
+          >
+            <FormattedMessage id="label.transactions" />
+          </AccordionSummary>
+          <AccordionDetails>
+          <TableContainer component={Paper}>
+            <Table sx={{ minWidth: 650 }} aria-label="simple table">
+              <TableHead>
+                <TableRow>
+                  <TableCell align="left">Username</TableCell>
+                  <TableCell align="right">Type</TableCell>
+                  <TableCell align="right">Amount</TableCell>
+                  <TableCell align="right">At</TableCell>
+                </TableRow>
+              </TableHead>
+              {item.transactions.map((transaction: any) =>
+              <TBody key={transaction.id}>
+                <TableCell component="th" scope="row">
+                  {transaction.username}
+                </TableCell>
+                <TableCell align="right">{transaction.type}</TableCell>
+                <TableCell align="right">{transaction.amount}</TableCell>
+                <TableCell align="right">{moment(transaction?.createdAt).format("dd/MM/yyyy HH:mm")}</TableCell>
+              </TBody>
+              )} 
+            </Table>
+          </TableContainer>
+          </AccordionDetails>
+        </Accordion>
         </>
       ),
     },
@@ -125,23 +182,23 @@ const TransactionTable = (): TransactionTableProps => {
   const tableHeader: TableHeader[] = [
     {
       align: "right",
-      title: "label.amount",
-      name: "amount",
+      title: "label.games",
+      name: "details",
     },
     {
       align: "right",
-      title: "label.title",
-      name: "type",
+      title: "label.bet.amount",
+      name: "betAmount",
     },
     {
       align: "right",
-      title: "label.status",
-      name: "status",
+      title: "label.total.amount",
+      name: "betAmount",
     },
     {
       align: "right",
-      title: "label.updated.at",
-      name: "updatedAt",
+      title: "label.details",
+      name: "details",
     },
     {
       align: "right",
