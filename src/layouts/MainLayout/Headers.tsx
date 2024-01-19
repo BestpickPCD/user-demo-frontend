@@ -19,7 +19,14 @@ import {
   CurrencyBitcoinRounded as Currency,
 } from "@mui/icons-material";
 import { useRouter } from "next/router";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import {
+  MutableRefObject,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { FormattedMessage } from "react-intl";
 import TransactionModal from "@/modules/Transactions/TransactionModal";
 import { useModal } from "@/utils/hooks";
@@ -43,6 +50,8 @@ const Headers = ({
   const { isSubmitTransaction } = useSelector(
     (state: RootState) => state.common
   );
+  const timeoutRef = useRef<any>();
+  const [balance, setBalance] = useState(0);
   const dispatch = useDispatch();
   const user = localStorage.getItem("user") || "";
   let parseUser;
@@ -54,6 +63,12 @@ const Headers = ({
     { id: parseUser?.id || null },
     { skip: !parseUser?.id }
   );
+
+  useEffect(() => {
+    if (data?.data) {
+      setBalance(data?.data?.balance ?? 0);
+    }
+  }, [data]);
 
   useEffect(() => {
     if (isSubmitTransaction) {
@@ -69,12 +84,19 @@ const Headers = ({
       const user = JSON.parse(localUser);
       if (url) {
         const socket = io(url);
-        socket.on(`${user.id}-played`, (data) => {
-          refetch();
-        });
+        if (timeoutRef) {
+          socket.on(`${user.id}-played`, async (data) => {
+            timeoutRef.current = setTimeout(() => {
+              return setBalance((balance) => {
+                return Number(balance) + Number(data.amount);
+              });
+            }, 1200);
+          });
+        }
       }
     }
-  }, []);
+    return () => clearTimeout(timeoutRef?.current);
+  }, [refetch]);
 
   useEffect(() => {
     setNavLink(router.pathname);
@@ -196,7 +218,7 @@ const Headers = ({
             <Box display="flex" alignItems="center" gap="4px">
               <Currency color="primary" sx={{ color: "#ffba00a6" }} />
               <Typography width="max-content" whiteSpace="nowrap">
-                {data?.data?.balance}
+                {balance}
               </Typography>
             </Box>
             <Typography
@@ -229,7 +251,7 @@ const Headers = ({
         </Box>
       );
     }
-  }, [theme, username, data]);
+  }, [theme, username, data, balance]);
 
   return (
     <Box
