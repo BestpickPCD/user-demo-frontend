@@ -43,8 +43,7 @@ const Games = () => {
     setDirectUrl(item.directUrl);
     setGameList(list);
     toggle();
-  };
-  console.log(gameList);
+  }; 
 
   return (
     <>
